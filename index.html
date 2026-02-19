@@ -69,21 +69,25 @@ button{background:#2563eb;color:white;cursor:pointer;}
 <div id="toast" class="toast"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  databaseURL: "SUA_DATABASE_URL",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
-};
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqezLaspgcS9B42CXOZl-FyY-SI5TphIk",
+    authDomain: "commanda-71512.firebaseapp.com",
+    databaseURL: "https://commanda-71512-default-rtdb.firebaseio.com",
+    projectId: "commanda-71512",
+    storageBucket: "commanda-71512.firebasestorage.app",
+    messagingSenderId: "789071833045",
+    appId: "1:789071833045:web:d28a7b2dddaa448304ff5c"
+  };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 
 const hoje = new Date().toISOString().split('T')[0];
 const mesasRef = ref(db, "mesas/"+hoje);
@@ -91,93 +95,75 @@ const historicoRef = ref(db, "historico/"+hoje);
 
 let mesaSelecionada = null;
 
-window.mostrarToast = function(mensagem){
+window.mostrarToast = function(msg){
   const toast = document.getElementById("toast");
-  toast.textContent = mensagem;
+  toast.textContent = msg;
   toast.classList.add("show");
-  setTimeout(()=> toast.classList.remove("show"),1500);
+  setTimeout(()=>toast.classList.remove("show"),1500);
 };
 
-// ================= PRODUTOS =================
-function mostrarProdutosPorCategoria(){
+const categorias = {
+  "Espetos":[
+    {nome:"Gado",preco:6},
+    {nome:"Porco",preco:6},
+    {nome:"Frango com osso",preco:6},
+    {nome:"Frango com bacon",preco:6}
+  ]
+};
+
+function mostrarProdutos(){
   const div = document.getElementById("produtos");
-  div.innerHTML = "";
+  div.innerHTML="";
 
-  Object.keys(categorias).forEach(cat => {
-    const catDiv = document.createElement("div");
-    catDiv.className = "categoria";
+  Object.keys(categorias).forEach(cat=>{
+    const catDiv=document.createElement("div");
+    catDiv.className="categoria";
 
-    const header = document.createElement("h4");
-    header.textContent = cat;
-    header.onclick = () => {
-      const collapse = catDiv.querySelector(".collapse");
-      collapse.style.display = collapse.style.display === "none" ? "block" : "none";
-    };
-
+    const header=document.createElement("h4");
+    header.textContent=cat;
+    header.onclick=()=>listDiv.style.display=listDiv.style.display==="none"?"block":"none";
     catDiv.appendChild(header);
 
-    const listDiv = document.createElement("div");
-    listDiv.className = "collapse";
-    listDiv.style.display = "none";
+    const listDiv=document.createElement("div");
+    listDiv.style.display="none";
 
-    categorias[cat].forEach(prod => {
-      const prodDiv = document.createElement("div");
-      prodDiv.className = "produto";
+    categorias[cat].forEach(prod=>{
+      const prodDiv=document.createElement("div");
+      prodDiv.className="produto";
 
-      prodDiv.innerHTML = `
+      prodDiv.innerHTML=`
         <span>${prod.nome} - R$${prod.preco}</span>
-        <div>
+        <div class="botoes">
           <button class="menos">-</button>
           <button class="mais">+</button>
         </div>
       `;
 
-      const itemRef = () => ref(db, "mesas/"+hoje+"/"+mesaSelecionada+"/itens/"+prod.nome);
+      const itemRef=()=>ref(db,"mesas/"+hoje+"/"+mesaSelecionada+"/itens/"+prod.nome);
 
-      // ADICIONAR
-      prodDiv.querySelector(".mais").onclick = () => {
-        if(!mesaSelecionada){
-          alert("Selecione uma mesa primeiro!");
-          return;
-        }
-
-        onValue(itemRef(), snapshot => {
-          let qtd = snapshot.exists()? snapshot.val().quantidade : 0;
-          set(itemRef(), {
-            nome: prod.nome,
-            preco: prod.preco,
-            quantidade: qtd + 1
-          });
-        }, {onlyOnce:true});
-
-        mostrarToast(prod.nome + " +1");
+      prodDiv.querySelector(".mais").onclick=()=>{
+        if(!mesaSelecionada){alert("Selecione uma mesa!");return;}
+        onValue(itemRef(),snap=>{
+          let qtd=snap.exists()?snap.val().quantidade:0;
+          set(itemRef(),{nome:prod.nome,preco:prod.preco,quantidade:qtd+1});
+        },{onlyOnce:true});
+        mostrarToast(prod.nome+" +1");
       };
 
-      // REMOVER
-      prodDiv.querySelector(".menos").onclick = () => {
-        if(!mesaSelecionada){
-          alert("Selecione uma mesa primeiro!");
-          return;
-        }
-
-        onValue(itemRef(), snapshot => {
-          if(!snapshot.exists()) return;
-
-          let dados = snapshot.val();
-          let novaQtd = dados.quantidade - 1;
-
-          if(novaQtd <= 0){
+      prodDiv.querySelector(".menos").onclick=()=>{
+        if(!mesaSelecionada){alert("Selecione uma mesa!");return;}
+        onValue(itemRef(),snap=>{
+          if(!snap.exists())return;
+          let dados=snap.val();
+          let novaQtd=dados.quantidade-1;
+          if(novaQtd<=0){
             remove(itemRef());
-            mostrarToast(prod.nome + " removido");
-          } else {
-            set(itemRef(), {
-              nome: prod.nome,
-              preco: prod.preco,
-              quantidade: novaQtd
-            });
-            mostrarToast(prod.nome + " -1");
+            mostrarToast(prod.nome+" removido");
+          }else{
+            set(itemRef(),{nome:prod.nome,preco:prod.preco,quantidade:novaQtd});
+            mostrarToast(prod.nome+" -1");
           }
-        }, {onlyOnce:true});
+        },{onlyOnce:true});
       };
 
       listDiv.appendChild(prodDiv);
@@ -188,62 +174,55 @@ function mostrarProdutosPorCategoria(){
   });
 }
 
-mostrarProdutosPorCategoria();
+mostrarProdutos();
 
-// ================= CRIAR MESA =================
-window.criarMesa = function(){
-  const nome = document.getElementById("nomeMesa").value;
-  if(!nome) return alert("Digite o nome da mesa!");
-  push(mesasRef, {nome, itens:{}});
-  document.getElementById("nomeMesa").value = "";
+window.criarMesa=function(){
+  const nome=document.getElementById("nomeMesa").value;
+  if(!nome)return alert("Digite o nome!");
+  push(mesasRef,{nome,itens:{}});
+  document.getElementById("nomeMesa").value="";
 };
 
-// ================= ATUALIZAR MESAS =================
-onValue(mesasRef, snapshot => {
-  const data = snapshot.val();
-  const div = document.getElementById("mesas");
-  div.innerHTML = "";
-
+onValue(mesasRef,snap=>{
+  const data=snap.val();
+  const div=document.getElementById("mesas");
+  div.innerHTML="";
   if(data){
-    Object.keys(data).forEach(id => {
-      const itens = data[id].itens || {};
-      let total = 0;
-      let detalhes = "";
-
-      Object.values(itens).forEach(item => {
-        total += item.preco * item.quantidade;
-        detalhes += `${item.nome} x${item.quantidade} | `;
+    Object.keys(data).forEach(id=>{
+      let total=0;
+      let detalhes="";
+      const itens=data[id].itens||{};
+      Object.values(itens).forEach(item=>{
+        total+=item.preco*item.quantidade;
+        detalhes+=`${item.nome} x${item.quantidade} | `;
       });
 
-      const mesaDiv = document.createElement("div");
-      mesaDiv.className = "mesa";
-      mesaDiv.innerHTML = `
+      const mesaDiv=document.createElement("div");
+      mesaDiv.className="mesa";
+      mesaDiv.innerHTML=`
         <strong>${data[id].nome}</strong><br>
         ${detalhes}<br>
         Total: <span class="total">R$${total}</span><br>
         <button class="fecharConta">Fechar Conta</button>
       `;
 
-      mesaDiv.onclick = (e) => {
-        if(e.target.classList.contains("fecharConta")) return;
-        mesaSelecionada = id;
-        document.querySelectorAll(".mesa").forEach(m => m.classList.remove("selecionada"));
+      mesaDiv.onclick=(e)=>{
+        if(e.target.classList.contains("fecharConta"))return;
+        mesaSelecionada=id;
+        document.querySelectorAll(".mesa").forEach(m=>m.classList.remove("selecionada"));
         mesaDiv.classList.add("selecionada");
       };
 
-      mesaDiv.querySelector(".fecharConta").onclick = (e) => {
+      mesaDiv.querySelector(".fecharConta").onclick=(e)=>{
         e.stopPropagation();
-
-        push(historicoRef, {
-          nome: data[id].nome,
-          itens: data[id].itens,
-          total: total,
-          fechadoEm: new Date().toLocaleString()
+        push(historicoRef,{
+          nome:data[id].nome,
+          itens:data[id].itens,
+          total:total,
+          fechadoEm:new Date().toLocaleString()
         });
-
-        remove(ref(db, "mesas/"+hoje+"/"+id));
-
-        if(mesaSelecionada === id) mesaSelecionada = null;
+        remove(ref(db,"mesas/"+hoje+"/"+id));
+        if(mesaSelecionada===id)mesaSelecionada=null;
       };
 
       div.appendChild(mesaDiv);
@@ -251,11 +230,57 @@ onValue(mesasRef, snapshot => {
   }
 });
 
-// ================= FILTRO =================
-window.filtrarProdutos = function(){
-  const filtro = document.getElementById("pesquisa").value.toLowerCase();
-  document.querySelectorAll(".produto").forEach(prod => {
-    prod.style.display = prod.textContent.toLowerCase().includes(filtro) ? "flex" : "none";
+onValue(historicoRef,snap=>{
+  const data=snap.val();
+  const div=document.getElementById("historico");
+  const resumo=document.getElementById("resumoDia");
+  div.innerHTML="";
+  resumo.innerHTML="";
+
+  if(!data){
+    div.innerHTML="<p style='color:lightgray;'>Nenhum histórico hoje.</p>";
+    resumo.innerHTML="<p style='color:lightgray;'>Nenhuma venda hoje.</p>";
+    return;
+  }
+
+  let totalDia=0;
+  let qtdMesas=0;
+
+  Object.values(data).forEach(mesa=>{
+    qtdMesas++;
+    totalDia+=mesa.total;
+
+    let detalhes="";
+    Object.values(mesa.itens||{}).forEach(item=>{
+      detalhes+=`${item.nome} x${item.quantidade} | `;
+    });
+
+    const histDiv=document.createElement("div");
+    histDiv.className="historicoMesa";
+    histDiv.innerHTML=`
+      <strong>${mesa.nome}</strong><br>
+      ${detalhes}<br>
+      <span class="total">R$${mesa.total}</span><br>
+      <small style="color:lightgray;">${mesa.fechadoEm}</small>
+    `;
+    div.appendChild(histDiv);
+  });
+
+  const media=(totalDia/qtdMesas).toFixed(2);
+
+  resumo.innerHTML=`
+    <div class="mesa">
+      💰 Total vendido hoje: <span class="total">R$${totalDia}</span><br>
+      🧾 Contas fechadas: ${qtdMesas}<br>
+      📈 Média por mesa: R$${media}
+    </div>
+  `;
+});
+
+window.filtrarProdutos=function(){
+  const filtro=document.getElementById("pesquisa").value.toLowerCase();
+  document.querySelectorAll(".produto").forEach(p=>{
+    p.style.display=p.textContent.toLowerCase().includes(filtro)?"flex":"none";
   });
 };
 </script>
