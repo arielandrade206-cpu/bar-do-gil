@@ -1,29 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comanda Profissional</title>
+<title>Sistema de Comanda</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#111;color:#fff}
-header{background:#1e1e1e;padding:15px;text-align:center;font-size:20px;font-weight:bold}
-.container{padding:10px}
-input{width:100%;padding:8px;border-radius:6px;border:none}
-button{padding:8px;border:none;border-radius:6px;margin:3px}
-.criar{background:#4caf50;color:white;width:100%}
-.editar{background:#ff9800;color:white}
-.excluir{background:#f44336;color:white}
-.abrir{background:#2196f3;color:white;width:100%}
-.addBtn{background:#4caf50;color:white}
-.removeBtn{background:#f44336;color:white}
-.mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}
-.mesaCard{background:#222;padding:10px;border-radius:10px;text-align:center}
-.item{display:flex;justify-content:space-between;margin:5px 0}
-.tabs{display:flex;overflow-x:auto;background:#222;margin-top:10px}
-.tab{padding:10px;cursor:pointer;white-space:nowrap}
-.tab.active{background:#ff9800}
-.total{font-weight:bold;font-size:18px;margin-top:10px}
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+}
+
+header{
+    background:#1e1e1e;
+    padding:15px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.container{
+    padding:15px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+
+button{
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-green{
+    background:#28a745;
+    color:white;
+    width:100%;
+    margin-bottom:10px;
+}
+
+.mesas{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.mesa{
+    background:#222;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    cursor:pointer;
+    border:2px solid #333;
+}
+
+.mesa.ativa{
+    border:2px solid #28a745;
+}
+
+.tabs{
+    display:flex;
+    gap:5px;
+    margin-bottom:10px;
+}
+
+.tab{
+    flex:1;
+    background:#222;
+    padding:10px;
+    text-align:center;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.tab.active{
+    background:#28a745;
+}
+
+.itens{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+    gap:10px;
+}
+
+.item{
+    background:#222;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.pedido{
+    margin-top:20px;
+}
+
+.pedido-item{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:5px;
+}
+
+.total{
+    margin-top:10px;
+    font-weight:bold;
+}
 </style>
 </head>
 <body>
@@ -31,234 +121,160 @@ button{padding:8px;border:none;border-radius:6px;margin:3px}
 <header>🔥 Sistema de Comanda</header>
 
 <div class="container">
-<input id="novaMesa" placeholder="Nome da mesa">
-<button class="criar" onclick="criarMesa()">Criar Mesa</button>
-<div class="mesas" id="listaMesas"></div>
+
+<input type="text" id="nomeMesa" placeholder="Nome da mesa">
+<button class="btn-green" onclick="criarMesa()">Criar Mesa</button>
+
+<div class="mesas" id="mesas"></div>
+
+<div class="tabs">
+<div class="tab active" onclick="trocarAba('bebidas',this)">Bebidas</div>
+<div class="tab" onclick="trocarAba('lanches',this)">Lanches</div>
+<div class="tab" onclick="trocarAba('porcoes',this)">Porções</div>
 </div>
 
-<div class="container" id="areaMesa" style="display:none">
-<h3 id="tituloMesa"></h3>
-<div class="tabs" id="tabs"></div>
-<div id="itens"></div>
+<div class="itens" id="listaItens"></div>
 
-<h3>Itens da Mesa</h3>
-<div id="listaItensMesa"></div>
-<div class="total">Total: R$ <span id="totalMesa">0</span></div>
-<button class="criar" onclick="fecharMesa()">Fechar Mesa</button>
+<div class="pedido">
+<h3>Pedido da Mesa</h3>
+<div id="pedidoLista"></div>
+<div class="total" id="totalMesa">Total: R$ 0.00</div>
+<button class="btn-green" onclick="fecharConta()">Fechar Conta</button>
 </div>
 
-<div class="container">
+<hr>
+
 <h3>📜 Histórico</h3>
 <div id="historico"></div>
-<div class="total">Total Geral: R$ <span id="totalGeral">0</span></div>
+<div class="total" id="totalGeral">Total Geral: R$ 0.00</div>
+
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, remove }
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyBqezLaspgcS9B42CXOZl-FyY-SI5TphIk",
-authDomain: "commanda-71512.firebaseapp.com",
-databaseURL: "https://commanda-71512-default-rtdb.firebaseio.com",
-projectId: "commanda-71512",
-storageBucket: "commanda-71512.firebasestorage.app",
-messagingSenderId: "789071833045",
-appId: "1:789071833045:web:d28a7b2dddaa448304ff5c"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-let mesaAtualId=null;
-let mesaAtual=null;
+<script>
+let mesas = [];
+let mesaAtiva = null;
+let historico = [];
 
 const cardapio = {
-
-"Espetos":[
-["Gado",6],["Porco",6],["Frango com osso",6],["Frango com bacon",6],
-["Coração",6],["Calabresa apimentada",6],["Calabresa defumada",6],
-["Pão de alho",6],["Queijo com bacon",7]
+bebidas:[
+{nome:"Coca-Cola",preco:6},
+{nome:"Guaraná",preco:6},
+{nome:"Água",preco:4}
 ],
-
-"Refris":[
-["Sukita laranja 1L",8],["Sukita laranja 2L",11],["It! Guaraná",8],
-["It! Coca",8],["It! Laranja",8],["Pepsi 2L",10],["Pepsi 2L zero",10],
-["Pepsi 1L",8],["Guaraná Lata",5],["Guaraná 1L",8],["Guaraná 2L",13],
-["Sukita uva 2L",11],["Coca lata",5],["Coca 1L",9],["Coca Ls",8],
-["Coca 2L",14],["Fys em geral",5],["It em geral",4],
-["Pepsi zero lata",4],["Guaraná zero",4],
-["Sukita uva",4],["Sukita laranja",4],["Soda limonada",4]
+lanches:[
+{nome:"X-Burguer",preco:18},
+{nome:"X-Salada",preco:20}
 ],
-
-"Cerveja Lata/Piriguete":[
-["Skol",5],["Subzero",5],["Brahma",5],["Amstel",5],
-["Devassa",5],["Lokal",4],["Antártica",5],["Crystal",5],
-["Caracu",7],["Original",6],["Crystal baden",5],
-["Black princess",5],["Brahma zero",5],["Brahma piriguete",5],
-["Skol piriguete",5],["Original piriguete",5],
-["Crystal piriguete",5],["Petra piriguete",5]
-],
-
-"Long Neck":[
-["Heineken",9],["Budweiser",8],["Budweiser zero",8],
-["Itaipava zero",8],["Cabaré limão",8],
-["Cabaré frutas vermelhas",8]
-],
-
-"Cerveja 600ML":[
-["Brahma 600ML",10],["Skol 600ML",10],["Subzero 600ML",8],
-["Amstel 600ML",9],["Crystal 600ML",6],["Lokal 600ML",6],
-["Heineken 600ML",12],["Budweiser 600ML",10],
-["Original 600ML",10],["Antarctica 600ML",9],
-["Itaipava 600ML",7],["Itaipava Premium 600ML",9],
-["Petra 600ML",8]
-],
-
-"Energéticos / Outros":[
-["Tnt 269ML",8],["Tnt 473ML",10],["Monster",14],
-["Redbull",10],["Água mineral",3],["Água com gás",4],
-["Água de coco",7],["H2o 500ML",7],["H2o 1,5L",10],
-["Skinka uva",5],["Skinka laranja",5],
-["Skinka morango",5],["Beats frutas verdes",7]
-],
-
-"Porções":[
-["Mandioca 1",1],["Mandioca 3",3],["Mandioca 5",5],["Mandioca 10",10],
-["Feijão farofado 1",1],["Feijão farofado 3",3],
-["Feijão farofado 5",5],["Feijão farofado 10",10],
-["Vinagrete",0]
+porcoes:[
+{nome:"Batata Frita",preco:25},
+{nome:"Calabresa",preco:30}
 ]
-
 };
 
-window.criarMesa=function(){
-const nome=document.getElementById("novaMesa").value;
-if(!nome)return alert("Digite o nome");
-const novaRef=push(ref(db,"mesas_abertas"));
-set(novaRef,{nome,itens:[],total:0});
-document.getElementById("novaMesa").value="";
-};
+function criarMesa(){
+let nome = document.getElementById("nomeMesa").value;
+if(!nome) return alert("Digite o nome da mesa");
 
-onValue(ref(db,"mesas_abertas"),snapshot=>{
-const lista=document.getElementById("listaMesas");
+let mesa = {nome, pedidos:[], total:0};
+mesas.push(mesa);
+renderMesas();
+document.getElementById("nomeMesa").value="";
+}
+
+function renderMesas(){
+let div = document.getElementById("mesas");
+div.innerHTML="";
+mesas.forEach((mesa,index)=>{
+let m = document.createElement("div");
+m.className="mesa";
+if(mesaAtiva===index) m.classList.add("ativa");
+m.innerHTML=mesa.nome+"<br>R$ "+mesa.total.toFixed(2);
+m.onclick=()=>selecionarMesa(index);
+div.appendChild(m);
+});
+}
+
+function selecionarMesa(index){
+mesaAtiva=index;
+renderMesas();
+renderPedido();
+}
+
+function trocarAba(categoria,el){
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+el.classList.add("active");
+renderItens(categoria);
+}
+
+function renderItens(categoria){
+let lista = document.getElementById("listaItens");
 lista.innerHTML="";
-snapshot.forEach(child=>{
-const mesa=child.val();
-const id=child.key;
-const div=document.createElement("div");
-div.className="mesaCard";
-div.innerHTML=`
-<strong>${mesa.nome}</strong><br>
-Total: R$ ${mesa.total||0}<br>
-<button class="abrir">Abrir</button>
-<button class="editar">✏</button>
-<button class="excluir">🗑</button>`;
-div.querySelector(".abrir").onclick=()=>abrirMesa(id);
-div.querySelector(".editar").onclick=()=>{
-const novo=prompt("Novo nome:",mesa.nome);
-if(novo)set(ref(db,"mesas_abertas/"+id+"/nome"),novo);
-};
-div.querySelector(".excluir").onclick=()=>{
-if(confirm("Excluir mesa?"))remove(ref(db,"mesas_abertas/"+id));
-};
+cardapio[categoria].forEach(item=>{
+let div=document.createElement("div");
+div.className="item";
+div.innerHTML=item.nome+"<br>R$ "+item.preco;
+div.onclick=()=>adicionarItem(item);
 lista.appendChild(div);
 });
-});
-
-function abrirMesa(id){
-mesaAtualId=id;
-onValue(ref(db,"mesas_abertas/"+id),snapshot=>{
-mesaAtual=snapshot.val();
-document.getElementById("areaMesa").style.display="block";
-document.getElementById("tituloMesa").innerText=mesaAtual.nome;
-renderCardapio();
-renderItens();
-});
 }
 
-function renderCardapio(){
-const tabs=document.getElementById("tabs");
-const itensDiv=document.getElementById("itens");
-tabs.innerHTML="";
-Object.keys(cardapio).forEach((cat,i)=>{
-const t=document.createElement("div");
-t.className="tab"+(i==0?" active":"");
-t.innerText=cat;
-t.onclick=()=>mostrar(cat,t);
-tabs.appendChild(t);
-});
-mostrar(Object.keys(cardapio)[0],tabs.firstChild);
+function adicionarItem(item){
+if(mesaAtiva===null) return alert("Selecione uma mesa");
+let mesa=mesas[mesaAtiva];
+mesa.pedidos.push(item);
+mesa.total+=item.preco;
+renderPedido();
+renderMesas();
 }
 
-function mostrar(cat,element){
-document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-element.classList.add("active");
-const itensDiv=document.getElementById("itens");
-itensDiv.innerHTML="";
-cardapio[cat].forEach(item=>{
-const d=document.createElement("div");
-d.className="item";
-d.innerHTML=`${item[0]} - R$ ${item[1]} <button class="addBtn">+</button>`;
-d.querySelector("button").onclick=()=>addItem(item);
-itensDiv.appendChild(d);
-});
-}
-
-function addItem(item){
-const novos=mesaAtual.itens||[];
-novos.push({nome:item[0],valor:item[1]});
-const total=(mesaAtual.total||0)+item[1];
-set(ref(db,"mesas_abertas/"+mesaAtualId),{
-nome:mesaAtual.nome,
-itens:novos,
-total
-});
-}
-
-function renderItens(){
-const lista=document.getElementById("listaItensMesa");
+function renderPedido(){
+if(mesaAtiva===null) return;
+let lista=document.getElementById("pedidoLista");
 lista.innerHTML="";
-(mesaAtual.itens||[]).forEach((item,i)=>{
-const d=document.createElement("div");
-d.className="item";
-d.innerHTML=`${item.nome} - R$ ${item.valor} <button class="removeBtn">X</button>`;
-d.querySelector("button").onclick=()=>{
-mesaAtual.itens.splice(i,1);
-mesaAtual.total-=item.valor;
-set(ref(db,"mesas_abertas/"+mesaAtualId),mesaAtual);
-};
-lista.appendChild(d);
+let mesa=mesas[mesaAtiva];
+mesa.pedidos.forEach((item,i)=>{
+let div=document.createElement("div");
+div.className="pedido-item";
+div.innerHTML=item.nome+" - R$ "+item.preco+
+" <button onclick='removerItem("+i+")'>❌</button>";
+lista.appendChild(div);
 });
-document.getElementById("totalMesa").innerText=mesaAtual.total||0;
+document.getElementById("totalMesa").innerText="Total: R$ "+mesa.total.toFixed(2);
 }
 
-window.fecharMesa=function(){
-push(ref(db,"historico"),{
-nome:mesaAtual.nome,
-total:mesaAtual.total,
-data:new Date().toLocaleString()
-});
-remove(ref(db,"mesas_abertas/"+mesaAtualId));
-document.getElementById("areaMesa").style.display="none";
-};
+function removerItem(i){
+let mesa=mesas[mesaAtiva];
+mesa.total-=mesa.pedidos[i].preco;
+mesa.pedidos.splice(i,1);
+renderPedido();
+renderMesas();
+}
 
-onValue(ref(db,"historico"),snapshot=>{
-let soma=0;
-const hist=document.getElementById("historico");
-hist.innerHTML="";
-snapshot.forEach(child=>{
-const d=child.val();
-soma+=d.total;
-const div=document.createElement("div");
-div.innerText=`${d.nome} - R$ ${d.total}`;
-hist.appendChild(div);
-});
-document.getElementById("totalGeral").innerText=soma;
-});
+function fecharConta(){
+if(mesaAtiva===null) return;
+let mesa=mesas[mesaAtiva];
+historico.push(mesa);
+mesas.splice(mesaAtiva,1);
+mesaAtiva=null;
+renderMesas();
+renderHistorico();
+document.getElementById("pedidoLista").innerHTML="";
+document.getElementById("totalMesa").innerText="Total: R$ 0.00";
+}
 
+function renderHistorico(){
+let div=document.getElementById("historico");
+div.innerHTML="";
+let totalGeral=0;
+historico.forEach(m=>{
+div.innerHTML+=m.nome+" - R$ "+m.total.toFixed(2)+"<br>";
+totalGeral+=m.total;
+});
+document.getElementById("totalGeral").innerText="Total Geral: R$ "+totalGeral.toFixed(2);
+}
+
+renderItens("bebidas");
 </script>
+
 </body>
 </html>
