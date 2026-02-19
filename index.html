@@ -1,89 +1,304 @@
-<!DOCTYPE html>
-<html>
-<head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<link rel="icon" href="icon.png">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bar do Gil - Sistema PRO</title>
-
-<style>
-body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:10px;}
-h1,h3{text-align:center;color:#38bdf8;}
-input,button{padding:8px;margin:5px 0;border-radius:8px;border:none;font-size:16px;}
-button{background:#2563eb;color:white;cursor:pointer;}
-.mesa,.historicoMesa{background:#1e293b;padding:10px;margin:5px 0;border-radius:10px;}
-.mesa.selecionada{border:2px solid #22c55e;}
-.total{color:#22c55e;font-weight:bold;}
-.categoria{background:#334155;margin:5px 0;border-radius:6px;}
-.categoria h4{margin:0;padding:10px;cursor:pointer;background:#1e293b;border-radius:6px;}
-.produto{padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;}
-.produto:last-child{border-bottom:none;}
-.botoes{display:flex;gap:5px;}
-.mais{background:#16a34a;}
-.menos{background:#dc2626;}
-.toast{
-  position:fixed;
-  top:20px;
-  right:20px;
-  background:#22c55e;
-  color:white;
-  padding:12px 18px;
-  border-radius:10px;
-  font-weight:bold;
-  opacity:0;
-  transform:translateY(-20px);
-  transition:all .3s ease;
-  z-index:9999;
-}
-.toast.show{
-  opacity:1;
-  transform:translateY(0);
-}
-</style>
-</head>
-<body>
-
-<h1>🍻 Bar do Gil</h1>
-
-<h3>Criar Mesa</h3>
-<input id="nomeMesa" placeholder="Digite o nome da mesa">
-<button onclick="criarMesa()">Criar</button>
-
-<h3>Pesquisar Produto</h3>
-<input id="pesquisa" placeholder="Pesquisar..." onkeyup="filtrarProdutos()">
-
-<div id="produtos"></div>
-
-<h3>Mesas Abertas</h3>
-<div id="mesas"></div>
-
-<h3>Histórico de Contas Fechadas</h3>
-<div id="historico"></div>
-
-<h3>Resumo do Dia</h3>
-<div id="resumoDia"></div>
-
-<div id="toast" class="toast"></div>
-
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBqezLaspgcS9B42CXOZl-FyY-SI5TphIk",
-    authDomain: "commanda-71512.firebaseapp.com",
-    databaseURL: "https://commanda-71512-default-rtdb.firebaseio.com",
-    projectId: "commanda-71512",
-    storageBucket: "commanda-71512.firebasestorage.app",
-    messagingSenderId: "789071833045",
-    appId: "1:789071833045:web:d28a7b2dddaa448304ff5c"
-  };
+<!DOCTYPE html>  <html>  
+<head>  
+<link rel="manifest" href="manifest.json">  
+<meta name="theme-color" content="#000000">  
+<link rel="icon" href="icon.png">  <meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Bar do Gil - Sistema PRO</title>  
+<style>  
+body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:10px;}  
+h1,h3{text-align:center;color:#38bdf8;}  
+input,button{padding:8px;margin:5px 0;border-radius:8px;border:none;font-size:16px;}  
+button{background:#2563eb;color:white;cursor:pointer;}  
+.mesa, .historicoMesa{background:#1e293b;padding:10px;margin:5px 0;border-radius:10px;}  
+.mesa.selecionada{border:2px solid #22c55e;}  
+.total{color:#22c55e;font-weight:bold;}  
+.categoria{background:#334155;margin:5px 0;border-radius:6px;}  
+.categoria h4{margin:0;padding:10px;cursor:pointer;background:#1e293b;border-radius:6px;}  
+.produto{padding:5px 10px;display:flex;justify-content: space-between;border-bottom:1px solid #1e293b;}  
+.produto button{background:#16a34a;border-radius:5px;padding:3px 8px;}  
+.produto:last-child{border-bottom:none;}  
+/* TOAST CONFIRMAÇÃO */  
+.toast{  
+  position:fixed;  
+  top:20px;  
+  right:20px;  
+  background:#22c55e;  
+  color:white;  
+  padding:12px 18px;  
+  border-radius:10px;  
+  font-weight:bold;  
+  opacity:0;  
+  transform:translateY(-20px);  
+  transition:all .3s ease;  
+  z-index:9999;  
+}  
+.toast.show{  
+  opacity:1;  
+  transform:translateY(0);  
+}  
+</style>  
+</head>  
+<body>  <h1>🍻 Bar do Gil</h1>  <h3>Criar Mesa</h3>  
+<input id="nomeMesa" placeholder="Digite o nome da mesa">  
+<button onclick="criarMesa()">Criar</button>  <h3>Pesquisar Produto</h3>  
+<input id="pesquisa" placeholder="Pesquisar..." onkeyup="filtrarProdutos()">  <div id="produtos"></div>  <h3>Mesas Abertas</h3>  
+<div id="mesas"></div>  <h3>Histórico de Contas Fechadas</h3>  
+<div id="historico"></div>  <h3>Resumo do Dia</h3>  
+<div id="resumoDia"></div>  <div id="toast" class="toast"></div>  <script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";  
+import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";  
+  
+// ===== FIREBASE CONFIG =====  
+const firebaseConfig = {  
+  apiKey: "AIzaSyBqezLaspgcS9B42CXOZl-FyY-SI5TphIk",  
+  authDomain: "commanda-71512.firebaseapp.com",  
+  databaseURL: "https://commanda-71512-default-rtdb.firebaseio.com",  
+  projectId: "commanda-71512",  
+  storageBucket: "commanda-71512.firebasestorage.app",  
+  messagingSenderId: "789071833045",  
+  appId: "1:789071833045:web:d28a7b2dddaa448304ff5c"  
+};  
+  
+const app = initializeApp(firebaseConfig);  
+const db = getDatabase(app);  
+const hoje = new Date().toISOString().split('T')[0];  
+const mesasRef = ref(db, "mesas/"+hoje);  
+const historicoRef = ref(db, "historico/"+hoje);  
+  
+let mesaSelecionada = null;  
+  
+// ===== TOAST CONFIRMAÇÃO =====  
+window.mostrarToast = function(mensagem){  
+  const toast = document.getElementById("toast");  
+  if(!toast) return;  
+  toast.textContent = mensagem;  
+  toast.classList.add("show");  
+  setTimeout(()=>{  
+    toast.classList.remove("show");  
+  },1500);  
+}  
+  
+// ===== PRODUTOS POR CATEGORIA =====  
+const categorias = {  
+  "Espetos":[  
+    {nome:"Gado",preco:6},{nome:"Porco",preco:6},{nome:"Frango com osso",preco:6},  
+    {nome:"Frango com bacon",preco:6},{nome:"Coração",preco:6},{nome:"Calabresa apimentada",preco:6},  
+    {nome:"Calabresa defumada",preco:6},{nome:"Pão de alho",preco:6},{nome:"Queijo com bacon",preco:6}  
+  ],  
+  "Refrigerantes":[  
+    {nome:"Sukita laranja 1L",preco:8},{nome:"Sukita laranja 2L",preco:11},{nome:"It! Guarana",preco:8},  
+    {nome:"It! Coca",preco:8},{nome:"It! Laranja",preco:8},{nome:"Pepsi 2L",preco:10},  
+    {nome:"Pepsi 2L zero",preco:10},{nome:"Pepsi 1L",preco:8},{nome:"Guaraná Lata",preco:5},  
+    {nome:"Guaraná 1 L",preco:8},{nome:"Guaraná 2 L",preco:13},{nome:"Sukita uva 2L",preco:11},  
+    {nome:"Coca lata",preco:5},{nome:"Coca 1 L",preco:9},{nome:"Coca Ls",preco:8},{nome:"Coca 2 L",preco:14},  
+    {nome:"Fys em geral",preco:5},{nome:"It em geral",preco:4},{nome:"Pepsi zero lata",preco:5},  
+    {nome:"Guaraná zero",preco:5},{nome:"Sukita uva",preco:5},{nome:"Sukita laranja",preco:5},  
+    {nome:"Soda limonada",preco:5}  
+  ],  
+  "Cerveja lata/piriguetes":[  
+    {nome:"Skol",preco:5},{nome:"Subzero",preco:5},{nome:"Brahma",preco:5},{nome:"Amstel",preco:5},  
+    {nome:"Devassa",preco:5},{nome:"Lokal",preco:4},{nome:"Antártica",preco:5},{nome:"Crystal",preco:5},  
+    {nome:"Caracu",preco:7},{nome:"Original",preco:6},{nome:"Crystal baden",preco:5},{nome:"Black princess",preco:5},  
+    {nome:"Brahma zero",preco:5},{nome:"Brahma piriguete",preco:5},{nome:"Skol piriguete",preco:5},  
+    {nome:"Original piriguete",preco:5},{nome:"Crystal piriguete",preco:5},{nome:"Petra piriguete",preco:5}  
+  ],  
+  "Long neck":[  
+    {nome:"Heineken",preco:9},{nome:"Budweiser",preco:8},{nome:"Budweiser zero",preco:8},  
+    {nome:"Itaipava zero",preco:8},{nome:"Cabaré limão",preco:8},{nome:"Cabaré frutas vermelhas",preco:8}  
+  ],  
+  "Cervejas 600ML":[  
+    {nome:"Brahma 600ml",preco:10},{nome:"Skol 600ml",preco:10},{nome:"Subzero 600ml",preco:8},  
+    {nome:"Amstel 600ml",preco:9},{nome:"Crystal 600ml",preco:6},{nome:"Lokal 600ml",preco:6},{nome:"Heineken 600ml",preco:12},  
+    {nome:"Budweiser 600ml",preco:10},{nome:"Original 600ml",preco:10},{nome:"Antarctica 600ml",preco:8},  
+    {nome:"Itaipava 600ml",preco:7},{nome:"Itaipava Premium",preco:9},{nome:"Petra 600ml",preco:8}  
+  ],  
+  "Energéticos/Outros":[  
+    {nome:"Tnt 269ML",preco:8},{nome:"Tnt 473ML",preco:10},{nome:"Monster",preco:14},{nome:"Redbull",preco:10},  
+    {nome:"Água mineral",preco:3},{nome:"Água com gás",preco:4},{nome:"Agua de coco",preco:7},  
+    {nome:"H2o 500Ml",preco:7},{nome:"H2o 1,5 L",preco:10},{nome:"Skinka uva",preco:5},  
+    {nome:"Skinka laranja",preco:5},{nome:"Skinka morango",preco:5},{nome:"Beats frutas verdes",preco:7}  
+  ],  
+  "Porções":[  
+    {nome:"Mandioca 1",preco:1},{nome:"Mandioca 3",preco:3},{nome:"Mandioca 5",preco:5},{nome:"Mandioca 10",preco:10},  
+    {nome:"Feijão farofado 1",preco:1},{nome:"Feijão farofado 3",preco:3},{nome:"Feijão farofado 5",preco:5},  
+    {nome:"Feijão farofado 10",preco:10},{nome:"Vinagrete",preco:0},{nome:"Vinagrete entrega",preco:2}  
+  ]  
+};  
+  
+// ================= MOSTRAR PRODUTOS =================  
+function mostrarProdutosPorCategoria(){  
+  const div = document.getElementById("produtos");  
+  div.innerHTML = "";  
+  Object.keys(categorias).forEach(cat => {  
+    const catDiv = document.createElement("div");  
+    catDiv.className = "categoria";  
+    const header = document.createElement("h4");  
+    header.textContent = cat;  
+    header.onclick = () => {  
+      const collapse = catDiv.querySelector(".collapse");  
+      collapse.style.display = (collapse.style.display === "none" ? "block" : "none");  
+    };  
+    catDiv.appendChild(header);  
+  
+    const listDiv = document.createElement("div");  
+    listDiv.className = "collapse";  
+    listDiv.style.display = "none";  
+  
+    categorias[cat].forEach(prod => {  
+      const prodDiv = document.createElement("div");  
+      prodDiv.className = "produto";  
+      prodDiv.innerHTML = `  
+        ${prod.nome} - R$${prod.preco}   
+        <button>+</button>  
+      `;  
+      prodDiv.querySelector("button").onclick = () => {  
+        if(!mesaSelecionada) {  
+          alert("Selecione uma mesa primeiro!");  
+          return;  
+        }  
+        const itemRef = ref(db, "mesas/"+hoje+"/"+mesaSelecionada+"/itens/"+prod.nome);  
+        onValue(itemRef, snapshot => {  
+          let qtd = snapshot.exists()? snapshot.val().quantidade : 0;  
+          set(itemRef, {nome: prod.nome, preco: prod.preco, quantidade: qtd+1});  
+        }, {onlyOnce:true});  
+  
+        window.mostrarToast(prod.nome + " adicionado!");  
+      };  
+      listDiv.appendChild(prodDiv);  
+    });  
+  
+    catDiv.appendChild(listDiv);  
+    div.appendChild(catDiv);  
+  });  
+}  
+  
+mostrarProdutosPorCategoria();  
+  
+// ================= CRIAR MESA =================  
+window.criarMesa = function(){  
+  const nome = document.getElementById("nomeMesa").value;  
+  if(!nome) return alert("Digite o nome da mesa!");  
+  push(mesasRef, {nome, itens:{}});  
+  document.getElementById("nomeMesa").value = "";  
+}  
+  
+// ================= MOSTRAR MESAS =================  
+function atualizarMesas(){  
+  onValue(mesasRef, snapshot => {  
+    const data = snapshot.val();  
+    const div = document.getElementById("mesas");  
+    div.innerHTML = "";  
+    if(data){  
+      Object.keys(data).forEach(id => {  
+        const itens = data[id].itens || {};  
+        let total = 0;  
+        let detalhes = "";  
+        Object.values(itens).forEach(item => {  
+          total += item.preco * item.quantidade;  
+          detalhes += `${item.nome} x${item.quantidade} | `;  
+        });  
+  
+        const mesaDiv = document.createElement("div");  
+        mesaDiv.className = "mesa";  
+        mesaDiv.dataset.id = id;  
+        mesaDiv.innerHTML = `  
+          <strong>${data[id].nome}</strong><br>  
+          ${detalhes}<br>  
+          Total: <span class="total">R$${total}</span><br>  
+          <button class="fecharConta">Fechar Conta</button>  
+        `;  
+  
+        mesaDiv.onclick = (e) => {  
+          if(e.target.classList.contains("fecharConta")) return;  
+          mesaSelecionada = id;  
+          document.querySelectorAll(".mesa").forEach(m => m.classList.remove("selecionada"));  
+          mesaDiv.classList.add("selecionada");  
+        }  
+  
+        mesaDiv.querySelector(".fecharConta").onclick = (e) => {  
+          e.stopPropagation();  
+          if(confirm(`Fechar conta da mesa "${data[id].nome}"?\nTotal: R$${total}`)){  
+            const registro = {  
+              nome: data[id].nome,  
+              itens: data[id].itens,  
+              total: total,  
+              fechadoEm: new Date().toLocaleString()  
+            };  
+            push(historicoRef, registro);  
+            remove(ref(db, "mesas/"+hoje+"/"+id));  
+            if(mesaSelecionada===id) mesaSelecionada = null;  
+          }  
+        }  
+  
+        div.appendChild(mesaDiv);  
+      });  
+    }  
+  });  
+}  
+  
+atualizarMesas();  
+  
+// ================= HISTÓRICO E RESUMO =================  
+onValue(historicoRef, snapshot => {  
+  const data = snapshot.val();  
+  const div = document.getElementById("historico");  
+  const resumoDiv = document.getElementById("resumoDia");  
+  
+  div.innerHTML = "";  
+  resumoDiv.innerHTML = "";  
+  
+  if(!data){  
+    div.innerHTML = "<p style='color:lightgray;'>Nenhum histórico por hoje.</p>";  
+    resumoDiv.innerHTML = "<p style='color:lightgray;'>Nenhuma venda hoje.</p>";  
+    return;  
+  }  
+  
+  let totalDia = 0;  
+  let quantidadeMesas = 0;  
+  
+  Object.values(data).forEach(mesa => {  
+    quantidadeMesas++;  
+    totalDia += mesa.total;  
+  
+    const itens = mesa.itens || {};  
+    let detalhes = "";  
+    Object.values(itens).forEach(item => {  
+      detalhes += `${item.nome} x${item.quantidade} | `;  
+    });  
+  
+    const histDiv = document.createElement("div");  
+    histDiv.className = "historicoMesa";  
+    histDiv.innerHTML = `  
+      <strong>${mesa.nome}</strong><br>  
+      ${detalhes}<br>  
+      <span class="total">R$${mesa.total}</span><br>  
+      <small style="color:lightgray;">Fechado em: ${mesa.fechadoEm}</small>  
+    `;  
+    div.appendChild(histDiv);  
+  });  
+  
+  const media = (totalDia / quantidadeMesas).toFixed(2);  
+  
+  resumoDiv.innerHTML = `  
+    <div class="mesa">  
+      💰 Total vendido hoje: <span class="total">R$${totalDia}</span><br>  
+      🧾 Contas fechadas: ${quantidadeMesas}<br>  
+      📈 Média por mesa: R$${media}  
+    </div>  
+  `;  
+});  
+  
+// ================= PESQUISA DE PRODUTOS =================  
+window.filtrarProdutos = function(){  
+  const filtro = document.getElementById("pesquisa").value.toLowerCase();  
+  document.querySelectorAll(".produto").forEach(prod => {  
+    const nome = prod.textContent.toLowerCase();  
+    prod.style.display = nome.includes(filtro)? "flex":"none";  
+  });  
+}  
+</script>  </body>  
+</html>    };
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
