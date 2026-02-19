@@ -3,47 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Profissional de Comanda</title>
+<title>Comanda Profissional</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#111;color:white}
+body{margin:0;font-family:Arial;background:#111;color:#fff}
 header{background:#1e1e1e;padding:15px;text-align:center;font-size:20px;font-weight:bold}
-
 .container{padding:10px}
-
-input{padding:8px;border:none;border-radius:6px;width:100%}
-
+input{width:100%;padding:8px;border-radius:6px;border:none}
 button{padding:8px;border:none;border-radius:6px;margin:3px}
-
 .criar{background:#4caf50;color:white;width:100%}
 .editar{background:#ff9800;color:white}
 .excluir{background:#f44336;color:white}
 .abrir{background:#2196f3;color:white;width:100%}
-
-.mesas{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-gap:10px;
-margin-top:10px
-}
-
-.mesaCard{
-background:#222;
-padding:10px;
-border-radius:10px;
-text-align:center;
-}
-
-.item{display:flex;justify-content:space-between;margin:5px 0}
-
 .addBtn{background:#4caf50;color:white}
 .removeBtn{background:#f44336;color:white}
-
-.total{font-weight:bold;margin-top:10px;font-size:18px}
-
+.mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}
+.mesaCard{background:#222;padding:10px;border-radius:10px;text-align:center}
+.item{display:flex;justify-content:space-between;margin:5px 0}
 .tabs{display:flex;overflow-x:auto;background:#222;margin-top:10px}
 .tab{padding:10px;cursor:pointer;white-space:nowrap}
 .tab.active{background:#ff9800}
+.total{font-weight:bold;font-size:18px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -53,13 +33,11 @@ text-align:center;
 <div class="container">
 <input id="novaMesa" placeholder="Nome da mesa">
 <button class="criar" onclick="criarMesa()">Criar Mesa</button>
-
 <div class="mesas" id="listaMesas"></div>
 </div>
 
 <div class="container" id="areaMesa" style="display:none">
 <h3 id="tituloMesa"></h3>
-
 <div class="tabs" id="tabs"></div>
 <div id="itens"></div>
 
@@ -78,7 +56,7 @@ text-align:center;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, remove } 
+import { getDatabase, ref, push, set, onValue, remove }
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -97,129 +75,72 @@ const db = getDatabase(app);
 let mesaAtualId=null;
 let mesaAtual=null;
 
-const cardapio={
+const cardapio = {
 
 "Espetos":[
-["Gado",6],
-["Porco",6],
-["Frango com osso",6],
-["Frango com bacon",6],
-["Coração",6],
-["Calabresa apimentada",6],
-["Calabresa defumada",6],
-["Pão de alho",6],
-["Queijo com bacon",7]
+["Gado",6],["Porco",6],["Frango com osso",6],["Frango com bacon",6],
+["Coração",6],["Calabresa apimentada",6],["Calabresa defumada",6],
+["Pão de alho",6],["Queijo com bacon",7]
 ],
 
 "Refris":[
-["Sukita laranja 1L",8],
-["Sukita laranja 2L",11],
-["It! Guaraná",8],
-["It! Coca",8],
-["It! Laranja",8],
-["Pepsi 2L",10],
-["Pepsi 2L zero",10],
-["Pepsi 1L",8],
-["Guaraná Lata",5],
-["Guaraná 1L",8],
-["Guaraná 2L",13],
-["Sukita uva 2L",11],
-["Coca lata",5],
-["Coca 1L",9],
-["Coca Ls",8],
-["Coca 2L",14],
-["Fys em geral",5],
-["It em geral",4],
-["Pepsi zero lata",4],
-["Guaraná zero",4],
-["Sukita uva",4],
-["Sukita laranja",4],
-["Soda limonada",4]
+["Sukita laranja 1L",8],["Sukita laranja 2L",11],["It! Guaraná",8],
+["It! Coca",8],["It! Laranja",8],["Pepsi 2L",10],["Pepsi 2L zero",10],
+["Pepsi 1L",8],["Guaraná Lata",5],["Guaraná 1L",8],["Guaraná 2L",13],
+["Sukita uva 2L",11],["Coca lata",5],["Coca 1L",9],["Coca Ls",8],
+["Coca 2L",14],["Fys em geral",5],["It em geral",4],
+["Pepsi zero lata",4],["Guaraná zero",4],
+["Sukita uva",4],["Sukita laranja",4],["Soda limonada",4]
 ],
 
 "Cerveja Lata/Piriguete":[
-["Skol",5],
-["Subzero",5],
-["Brahma",5],
-["Amstel",5],
-["Devassa",5],
-["Lokal",4],
-["Antártica",5],
-["Crystal",5],
-["Caracu",7],
-["Original",6],
-["Crystal baden",5],
-["Black princess",5],
-["Brahma zero",5],
-["Brahma piriguete",5],
-["Skol piriguete",5],
-["Original piriguete",5],
-["Crystal piriguete",5],
-["Petra piriguete",5]
+["Skol",5],["Subzero",5],["Brahma",5],["Amstel",5],
+["Devassa",5],["Lokal",4],["Antártica",5],["Crystal",5],
+["Caracu",7],["Original",6],["Crystal baden",5],
+["Black princess",5],["Brahma zero",5],["Brahma piriguete",5],
+["Skol piriguete",5],["Original piriguete",5],
+["Crystal piriguete",5],["Petra piriguete",5]
 ],
 
 "Long Neck":[
-["Heineken",9],
-["Budweiser",8],
-["Budweiser zero",8],
-["Itaipava zero",8],
-["Cabaré limão",8],
+["Heineken",9],["Budweiser",8],["Budweiser zero",8],
+["Itaipava zero",8],["Cabaré limão",8],
 ["Cabaré frutas vermelhas",8]
 ],
 
 "Cerveja 600ML":[
-["Brahma 600ML",10],
-["Skol 600ML",10],
-["Subzero 600ML",8],
-["Amstel 600ML",9],
-["Crystal 600ML",6],
-["Lokal 600ML",6],
-["Heineken 600ML",12],
-["Budweiser 600ML",10],
-["Original 600ML",10],
-["Antarctica 600ML",9],
-["Itaipava 600ML",7],
-["Itaipava Premium 600ML",9],
+["Brahma 600ML",10],["Skol 600ML",10],["Subzero 600ML",8],
+["Amstel 600ML",9],["Crystal 600ML",6],["Lokal 600ML",6],
+["Heineken 600ML",12],["Budweiser 600ML",10],
+["Original 600ML",10],["Antarctica 600ML",9],
+["Itaipava 600ML",7],["Itaipava Premium 600ML",9],
 ["Petra 600ML",8]
 ],
 
 "Energéticos / Outros":[
-["Tnt 269ML",8],
-["Tnt 473ML",10],
-["Monster",14],
-["Redbull",10],
-["Água mineral",3],
-["Água com gás",4],
-["Água de coco",7],
-["H2o 500ML",7],
-["H2o 1,5L",10],
-["Skinka uva",5],
-["Skinka laranja",5],
-["Skinka morango",5],
-["Beats frutas verdes",7]
+["Tnt 269ML",8],["Tnt 473ML",10],["Monster",14],
+["Redbull",10],["Água mineral",3],["Água com gás",4],
+["Água de coco",7],["H2o 500ML",7],["H2o 1,5L",10],
+["Skinka uva",5],["Skinka laranja",5],
+["Skinka morango",5],["Beats frutas verdes",7]
 ],
 
 "Porções":[
-["Mandioca 1",1],
-["Mandioca 3",3],
-["Mandioca 5",5],
-["Mandioca 10",10],
-["Feijão farofado 1",1],
-["Feijão farofado 3",3],
-["Feijão farofado 5",5],
-["Feijão farofado 10",10],
+["Mandioca 1",1],["Mandioca 3",3],["Mandioca 5",5],["Mandioca 10",10],
+["Feijão farofado 1",1],["Feijão farofado 3",3],
+["Feijão farofado 5",5],["Feijão farofado 10",10],
 ["Vinagrete",0]
 ]
 
 };
 
-function criarMesa(){
+window.criarMesa=function(){
 const nome=document.getElementById("novaMesa").value;
 if(!nome)return alert("Digite o nome");
 const novaRef=push(ref(db,"mesas_abertas"));
-set(novaRef,{nome:nome,itens:[],total:0});
+set(novaRef,{nome,itens:[],total:0});
 document.getElementById("novaMesa").value="";
-}
+};
 
 onValue(ref(db,"mesas_abertas"),snapshot=>{
 const lista=document.getElementById("listaMesas");
@@ -230,14 +151,12 @@ const id=child.key;
 const div=document.createElement("div");
 div.className="mesaCard";
 div.innerHTML=`
-<strong>${mesa.nome}</strong>
-<br>Total: R$ ${mesa.total||0}
-<br>
+<strong>${mesa.nome}</strong><br>
+Total: R$ ${mesa.total||0}<br>
 <button class="abrir">Abrir</button>
 <button class="editar">✏</button>
-<button class="excluir">🗑</button>
-`;
-div.querySelector(".abrir").onclick=()=>abrirMesa(id,mesa);
+<button class="excluir">🗑</button>`;
+div.querySelector(".abrir").onclick=()=>abrirMesa(id);
 div.querySelector(".editar").onclick=()=>{
 const novo=prompt("Novo nome:",mesa.nome);
 if(novo)set(ref(db,"mesas_abertas/"+id+"/nome"),novo);
@@ -249,20 +168,21 @@ lista.appendChild(div);
 });
 });
 
-function abrirMesa(id,mesa){
+function abrirMesa(id){
 mesaAtualId=id;
-mesaAtual=mesa;
+onValue(ref(db,"mesas_abertas/"+id),snapshot=>{
+mesaAtual=snapshot.val();
 document.getElementById("areaMesa").style.display="block";
-document.getElementById("tituloMesa").innerText=mesa.nome;
-renderItensMesa();
+document.getElementById("tituloMesa").innerText=mesaAtual.nome;
 renderCardapio();
+renderItens();
+});
 }
 
 function renderCardapio(){
 const tabs=document.getElementById("tabs");
 const itensDiv=document.getElementById("itens");
 tabs.innerHTML="";
-itensDiv.innerHTML="";
 Object.keys(cardapio).forEach((cat,i)=>{
 const t=document.createElement("div");
 t.className="tab"+(i==0?" active":"");
@@ -288,38 +208,34 @@ itensDiv.appendChild(d);
 }
 
 function addItem(item){
-if(!mesaAtualId)return;
-const novosItens=mesaAtual.itens||[];
-novosItens.push({nome:item[0],valor:item[1]});
-const novoTotal=(mesaAtual.total||0)+item[1];
+const novos=mesaAtual.itens||[];
+novos.push({nome:item[0],valor:item[1]});
+const total=(mesaAtual.total||0)+item[1];
 set(ref(db,"mesas_abertas/"+mesaAtualId),{
 nome:mesaAtual.nome,
-itens:novosItens,
-total:novoTotal
+itens:novos,
+total
 });
 }
 
-function renderItensMesa(){
-onValue(ref(db,"mesas_abertas/"+mesaAtualId),snapshot=>{
-mesaAtual=snapshot.val();
+function renderItens(){
 const lista=document.getElementById("listaItensMesa");
 lista.innerHTML="";
-(mesaAtual.itens||[]).forEach((item,index)=>{
+(mesaAtual.itens||[]).forEach((item,i)=>{
 const d=document.createElement("div");
 d.className="item";
 d.innerHTML=`${item.nome} - R$ ${item.valor} <button class="removeBtn">X</button>`;
 d.querySelector("button").onclick=()=>{
-mesaAtual.itens.splice(index,1);
+mesaAtual.itens.splice(i,1);
 mesaAtual.total-=item.valor;
 set(ref(db,"mesas_abertas/"+mesaAtualId),mesaAtual);
 };
 lista.appendChild(d);
 });
 document.getElementById("totalMesa").innerText=mesaAtual.total||0;
-});
 }
 
-function fecharMesa(){
+window.fecharMesa=function(){
 push(ref(db,"historico"),{
 nome:mesaAtual.nome,
 total:mesaAtual.total,
@@ -327,7 +243,7 @@ data:new Date().toLocaleString()
 });
 remove(ref(db,"mesas_abertas/"+mesaAtualId));
 document.getElementById("areaMesa").style.display="none";
-}
+};
 
 onValue(ref(db,"historico"),snapshot=>{
 let soma=0;
