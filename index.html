@@ -3,99 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comanda Mobile</title>
+<title>Comanda Profissional</title>
 
 <style>
-body{
-  margin:0;
-  background:#0d0d0d;
-  color:white;
-  font-family:Arial;
-}
-
-header{
-  background:#00aaff;
-  padding:15px;
-  text-align:center;
-  font-size:20px;
-  font-weight:bold;
-  color:black;
-}
-
-.container{
-  padding:10px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-}
-
-button{
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  margin:4px 0;
-  font-size:15px;
-}
-
-.btn-primary{
-  background:#00aaff;
-  color:black;
-  width:100%;
-}
-
-.mesa-btn{
-  background:#1c1c1c;
-  color:white;
-  width:100%;
-}
-
-.mesa-ativa{
-  border:2px solid #00aaff;
-}
-
-.card{
-  background:#1a1a1a;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-
-.item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:6px 0;
-}
-
-.add-btn{
-  background:#00aaff;
-  color:black;
-  padding:8px 12px;
-}
-
-.qtd-btn{
-  background:#333;
-  color:white;
-  padding:5px 8px;
-}
-
-.total{
-  font-weight:bold;
-  font-size:18px;
-  margin-top:10px;
-}
+body{margin:0;background:#0f0f0f;color:white;font-family:Arial}
+header{background:#00aaff;color:black;text-align:center;padding:15px;font-size:20px;font-weight:bold}
+.container{padding:10px}
+input{width:100%;padding:12px;border:none;border-radius:8px;margin-bottom:10px;font-size:16px}
+button{border:none;border-radius:8px;padding:10px;font-weight:bold;margin:3px;font-size:14px}
+.btn-primary{background:#00aaff;color:black;width:100%}
+.mesa-btn{background:#1c1c1c;color:white;width:100%}
+.mesa-ativa{border:2px solid #00aaff}
+.tabs{display:flex;overflow-x:auto;margin-bottom:10px}
+.tab{background:#1c1c1c;color:white;padding:8px 12px;margin-right:5px;border-radius:20px;white-space:nowrap}
+.tab.active{background:#00aaff;color:black}
+.card{background:#1a1a1a;padding:10px;border-radius:10px;margin-bottom:10px}
+.item{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+.add-btn{background:#00aaff;color:black;padding:6px 10px}
+.qtd-btn{background:#333;color:white;padding:4px 8px}
+.total{font-size:18px;font-weight:bold;margin-top:10px}
 </style>
 </head>
 <body>
 
-<header>🧾 Comanda Mobile</header>
+<header>🧾 Comanda Profissional</header>
 
 <div class="container">
 
@@ -106,143 +37,174 @@ button{
 
 <hr>
 
+<div class="tabs" id="tabs"></div>
+
 <input type="text" id="search" placeholder="Pesquisar item...">
 
 <div id="cardapio"></div>
 
 <hr>
 
-<div id="mesaAtualInfo"></div>
+<div id="mesaAtual"></div>
 
 </div>
 
 <script>
 
-let mesaSelecionada = null;
-let mesas = {};
+let mesaSelecionada=null;
+let categoriaAtual="Espetos";
+let mesas={};
 
-let itens = [
+let categorias={
+"Espetos":[
 ["Gado",6],["Porco",6],["Frango com osso",6],["Frango com bacon",6],
 ["Coração",6],["Calabresa apimentada",6],["Calabresa defumada",6],
-["Pão de alho",6],["Queijo com bacon",7],
-["Heineken",9],["Skol",5],["Brahma",5],
-["Coca 2L",14],["Guaraná Lata",5],
+["Pão de alho",6],["Queijo com bacon",7]
+],
+"Refris":[
+["Sukita laranja 1L",8],["Sukita laranja 2L",11],["It! Guaraná",8],
+["It! Coca",8],["It! Laranja",8],["Pepsi 2L",10],["Pepsi 2L zero",10],
+["Pepsi 1L",8],["Guaraná Lata",5],["Guaraná 1L",8],["Guaraná 2L",13],
+["Sukita uva 2L",11],["Coca lata",5],["Coca 1L",9],["Coca LS",8],
+["Coca 2L",14],["Fys em geral",5],["It em geral",4],
+["Pepsi zero lata",4],["Guaraná zero",4],["Sukita uva",4],
+["Sukita laranja",4],["Soda limonada",4]
+],
+"Cerveja Lata":[
+["Skol",5],["Subzero",5],["Brahma",5],["Amstel",5],["Devassa",5],
+["Lokal",4],["Antártica",5],["Crystal",5],["Caracu",7],
+["Original",6],["Crystal baden",5],["Black princess",5],
+["Brahma zero",5],["Brahma piriguete",5],["Skol piriguete",5],
+["Original piriguete",5],["Crystal piriguete",5],["Petra piriguete",5]
+],
+"Long Neck":[
+["Heineken",9],["Budweiser",8],["Budweiser zero",8],
+["Itaipava zero",8],["Cabaré limão",8],["Cabaré frutas vermelhas",8]
+],
+"Cervejas 600ML":[
+["Brahma 600ml",10],["Skol 600ml",10],["Subzero 600ml",8],
+["Amstel 600ml",9],["Crystal 600ml",6],["Lokal 600ml",6],
+["Heineken 600ml",12],["Budweiser 600ml",10],
+["Original 600ml",10],["Antarctica 600ml",9],
+["Itaipava",7],["Itaipava Premium",9],["Petra",8]
+],
+"Energéticos":[
+["TNT 269ML",8],["TNT 473ML",10],["Monster",14],
+["Redbull",10],["Água mineral",3],["Água com gás",4],
+["Água de coco",7],["H2O 500ML",7],["H2O 1,5L",10],
+["Skinka uva",5],["Skinka laranja",5],
+["Skinka morango",5],["Beats frutas verdes",7]
+],
+"Porções":[
 ["Mandioca P",1],["Mandioca M",3],["Mandioca G",5],["Mandioca GG",10],
+["Feijão farofado P",1],["Feijão farofado M",3],
+["Feijão farofado G",5],["Feijão farofado GG",10],
 ["Vinagrete",0]
-];
+]
+};
 
 function criarMesa(){
-  let nome = document.getElementById("novaMesa").value;
-  if(!nome) return;
-
-  mesas[nome] = [];
-  mesaSelecionada = nome;
-
-  document.getElementById("novaMesa").value="";
-  renderMesas();
-  renderMesaAtual();
+let nome=document.getElementById("novaMesa").value;
+if(!nome)return;
+mesas[nome]=[];
+mesaSelecionada=nome;
+document.getElementById("novaMesa").value="";
+renderMesas();
+renderMesaAtual();
 }
 
 function renderMesas(){
-  let div = document.getElementById("listaMesas");
-  div.innerHTML = "";
-
-  for(let mesa in mesas){
-    div.innerHTML += `
-      <button class="mesa-btn ${mesa===mesaSelecionada?'mesa-ativa':''}"
-      onclick="selecionarMesa('${mesa}')">
-      Mesa ${mesa}
-      </button>
-    `;
-  }
+let div=document.getElementById("listaMesas");
+div.innerHTML="";
+for(let mesa in mesas){
+div.innerHTML+=`
+<button class="mesa-btn ${mesa===mesaSelecionada?'mesa-ativa':''}"
+onclick="selecionarMesa('${mesa}')">
+Mesa ${mesa}
+</button>`;
+}
 }
 
 function selecionarMesa(nome){
-  mesaSelecionada = nome;
-  renderMesas();
-  renderMesaAtual();
+mesaSelecionada=nome;
+renderMesas();
+renderMesaAtual();
+}
+
+function renderTabs(){
+let div=document.getElementById("tabs");
+div.innerHTML="";
+for(let cat in categorias){
+div.innerHTML+=`
+<div class="tab ${cat===categoriaAtual?'active':''}"
+onclick="trocarCategoria('${cat}')">
+${cat}
+</div>`;
+}
+}
+
+function trocarCategoria(cat){
+categoriaAtual=cat;
+renderTabs();
+renderCardapio();
 }
 
 function renderCardapio(){
-  let div = document.getElementById("cardapio");
-  div.innerHTML="";
-
-  itens.forEach(item=>{
-    div.innerHTML += `
-      <div class="item">
-        ${item[0]} - R$ ${item[1]}
-        <button class="add-btn" onclick="addItem('${item[0]}',${item[1]})">+</button>
-      </div>
-    `;
-  });
+let div=document.getElementById("cardapio");
+div.innerHTML="";
+categorias[categoriaAtual].forEach(item=>{
+div.innerHTML+=`
+<div class="item">
+${item[0]} - R$ ${item[1]}
+<button class="add-btn" onclick="addItem('${item[0]}',${item[1]})">+</button>
+</div>`;
+});
 }
 
 function addItem(nome,preco){
-  if(!mesaSelecionada) return alert("Selecione uma mesa!");
-
-  let existente = mesas[mesaSelecionada].find(i=>i.nome===nome);
-
-  if(existente){
-    existente.qtd++;
-  } else {
-    mesas[mesaSelecionada].push({nome,preco,qtd:1});
-  }
-
-  renderMesaAtual();
+if(!mesaSelecionada)return alert("Selecione uma mesa!");
+let existente=mesas[mesaSelecionada].find(i=>i.nome===nome);
+if(existente){existente.qtd++}
+else{mesas[mesaSelecionada].push({nome,preco,qtd:1})}
+renderMesaAtual();
 }
 
 function alterarQtd(index,delta){
-  let item = mesas[mesaSelecionada][index];
-  item.qtd += delta;
-
-  if(item.qtd<=0){
-    mesas[mesaSelecionada].splice(index,1);
-  }
-
-  renderMesaAtual();
+let item=mesas[mesaSelecionada][index];
+item.qtd+=delta;
+if(item.qtd<=0)mesas[mesaSelecionada].splice(index,1);
+renderMesaAtual();
 }
 
 function renderMesaAtual(){
-  let div = document.getElementById("mesaAtualInfo");
-
-  if(!mesaSelecionada){
-    div.innerHTML="<p>Selecione uma mesa</p>";
-    return;
-  }
-
-  let total=0;
-  div.innerHTML=`<div class="card"><h3>Mesa ${mesaSelecionada}</h3>`;
-
-  mesas[mesaSelecionada].forEach((item,i)=>{
-    total += item.preco*item.qtd;
-
-    div.innerHTML += `
-      <div class="item">
-        ${item.nome} x${item.qtd}
-        <div>
-          <button class="qtd-btn" onclick="alterarQtd(${i},1)">+</button>
-          <button class="qtd-btn" onclick="alterarQtd(${i},-1)">-</button>
-        </div>
-      </div>
-    `;
-  });
-
-  div.innerHTML += `
-    <div class="total">Total: R$ ${total.toFixed(2)}</div>
-    </div>
-  `;
+let div=document.getElementById("mesaAtual");
+if(!mesaSelecionada){div.innerHTML="";return;}
+let total=0;
+div.innerHTML=`<div class="card"><h3>Mesa ${mesaSelecionada}</h3>`;
+mesas[mesaSelecionada].forEach((item,i)=>{
+total+=item.preco*item.qtd;
+div.innerHTML+=`
+<div class="item">
+${item.nome} x${item.qtd}
+<div>
+<button class="qtd-btn" onclick="alterarQtd(${i},1)">+</button>
+<button class="qtd-btn" onclick="alterarQtd(${i},-1)">-</button>
+</div>
+</div>`;
+});
+div.innerHTML+=`<div class="total">Total: R$ ${total.toFixed(2)}</div></div>`;
 }
 
 document.getElementById("search").addEventListener("input",function(){
-  let filtro=this.value.toLowerCase();
-  document.querySelectorAll("#cardapio .item").forEach(item=>{
-    item.style.display=item.textContent.toLowerCase().includes(filtro)?"flex":"none";
-  });
+let filtro=this.value.toLowerCase();
+document.querySelectorAll("#cardapio .item").forEach(item=>{
+item.style.display=item.textContent.toLowerCase().includes(filtro)?"flex":"none";
+});
 });
 
+renderTabs();
 renderCardapio();
 
 </script>
-
 </body>
 </html>
