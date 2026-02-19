@@ -1,501 +1,190 @@
-<!DOCTYPE html>  <html>  
-<head>  
-<link rel="manifest" href="manifest.json">  
-<meta name="theme-color" content="#000000">  
-<link rel="icon" href="icon.png">  <meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Bar do Gil - Sistema PRO</title>  
-<style>  
-body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:10px;}  
-h1,h3{text-align:center;color:#38bdf8;}  
-input,button{padding:8px;margin:5px 0;border-radius:8px;border:none;font-size:16px;}  
-button{background:#2563eb;color:white;cursor:pointer;}  
-.mesa, .historicoMesa{background:#1e293b;padding:10px;margin:5px 0;border-radius:10px;}  
-.mesa.selecionada{border:2px solid #22c55e;}  
-.total{color:#22c55e;font-weight:bold;}  
-.categoria{background:#334155;margin:5px 0;border-radius:6px;}  
-.categoria h4{margin:0;padding:10px;cursor:pointer;background:#1e293b;border-radius:6px;}  
-.produto{padding:5px 10px;display:flex;justify-content: space-between;border-bottom:1px solid #1e293b;}  
-.produto button{background:#16a34a;border-radius:5px;padding:3px 8px;}  
-.produto:last-child{border-bottom:none;}  
-/* TOAST CONFIRMAÇÃO */  
-.toast{  
-  position:fixed;  
-  top:20px;  
-  right:20px;  
-  background:#22c55e;  
-  color:white;  
-  padding:12px 18px;  
-  border-radius:10px;  
-  font-weight:bold;  
-  opacity:0;  
-  transform:translateY(-20px);  
-  transition:all .3s ease;  
-  z-index:9999;  
-}  
-.toast.show{  
-  opacity:1;  
-  transform:translateY(0);  
-}  
-</style>  
-</head>  
-<body>  <h1>🍻 Bar do Gil</h1>  <h3>Criar Mesa</h3>  
-<input id="nomeMesa" placeholder="Digite o nome da mesa">  
-<button onclick="criarMesa()">Criar</button>  <h3>Pesquisar Produto</h3>  
-<input id="pesquisa" placeholder="Pesquisar..." onkeyup="filtrarProdutos()">  <div id="produtos"></div>  <h3>Mesas Abertas</h3>  
-<div id="mesas"></div>  <h3>Histórico de Contas Fechadas</h3>  
-<div id="historico"></div>  <h3>Resumo do Dia</h3>  
-<div id="resumoDia"></div>  <div id="toast" class="toast"></div>  <script type="module">  
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";  
-import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";  
-  
-// ===== FIREBASE CONFIG =====  
-const firebaseConfig = {  
-  apiKey: "AIzaSyBqezLaspgcS9B42CXOZl-FyY-SI5TphIk",  
-  authDomain: "commanda-71512.firebaseapp.com",  
-  databaseURL: "https://commanda-71512-default-rtdb.firebaseio.com",  
-  projectId: "commanda-71512",  
-  storageBucket: "commanda-71512.firebasestorage.app",  
-  messagingSenderId: "789071833045",  
-  appId: "1:789071833045:web:d28a7b2dddaa448304ff5c"  
-};  
-  
-const app = initializeApp(firebaseConfig);  
-const db = getDatabase(app);  
-const hoje = new Date().toISOString().split('T')[0];  
-const mesasRef = ref(db, "mesas/"+hoje);  
-const historicoRef = ref(db, "historico/"+hoje);  
-  
-let mesaSelecionada = null;  
-  
-// ===== TOAST CONFIRMAÇÃO =====  
-window.mostrarToast = function(mensagem){  
-  const toast = document.getElementById("toast");  
-  if(!toast) return;  
-  toast.textContent = mensagem;  
-  toast.classList.add("show");  
-  setTimeout(()=>{  
-    toast.classList.remove("show");  
-  },1500);  
-}  
-  
-// ===== PRODUTOS POR CATEGORIA =====  
-const categorias = {  
-  "Espetos":[  
-    {nome:"Gado",preco:6},{nome:"Porco",preco:6},{nome:"Frango com osso",preco:6},  
-    {nome:"Frango com bacon",preco:6},{nome:"Coração",preco:6},{nome:"Calabresa apimentada",preco:6},  
-    {nome:"Calabresa defumada",preco:6},{nome:"Pão de alho",preco:6},{nome:"Queijo com bacon",preco:6}  
-  ],  
-  "Refrigerantes":[  
-    {nome:"Sukita laranja 1L",preco:8},{nome:"Sukita laranja 2L",preco:11},{nome:"It! Guarana",preco:8},  
-    {nome:"It! Coca",preco:8},{nome:"It! Laranja",preco:8},{nome:"Pepsi 2L",preco:10},  
-    {nome:"Pepsi 2L zero",preco:10},{nome:"Pepsi 1L",preco:8},{nome:"Guaraná Lata",preco:5},  
-    {nome:"Guaraná 1 L",preco:8},{nome:"Guaraná 2 L",preco:13},{nome:"Sukita uva 2L",preco:11},  
-    {nome:"Coca lata",preco:5},{nome:"Coca 1 L",preco:9},{nome:"Coca Ls",preco:8},{nome:"Coca 2 L",preco:14},  
-    {nome:"Fys em geral",preco:5},{nome:"It em geral",preco:4},{nome:"Pepsi zero lata",preco:5},  
-    {nome:"Guaraná zero",preco:5},{nome:"Sukita uva",preco:5},{nome:"Sukita laranja",preco:5},  
-    {nome:"Soda limonada",preco:5}  
-  ],  
-  "Cerveja lata/piriguetes":[  
-    {nome:"Skol",preco:5},{nome:"Subzero",preco:5},{nome:"Brahma",preco:5},{nome:"Amstel",preco:5},  
-    {nome:"Devassa",preco:5},{nome:"Lokal",preco:4},{nome:"Antártica",preco:5},{nome:"Crystal",preco:5},  
-    {nome:"Caracu",preco:7},{nome:"Original",preco:6},{nome:"Crystal baden",preco:5},{nome:"Black princess",preco:5},  
-    {nome:"Brahma zero",preco:5},{nome:"Brahma piriguete",preco:5},{nome:"Skol piriguete",preco:5},  
-    {nome:"Original piriguete",preco:5},{nome:"Crystal piriguete",preco:5},{nome:"Petra piriguete",preco:5}  
-  ],  
-  "Long neck":[  
-    {nome:"Heineken",preco:9},{nome:"Budweiser",preco:8},{nome:"Budweiser zero",preco:8},  
-    {nome:"Itaipava zero",preco:8},{nome:"Cabaré limão",preco:8},{nome:"Cabaré frutas vermelhas",preco:8}  
-  ],  
-  "Cervejas 600ML":[  
-    {nome:"Brahma 600ml",preco:10},{nome:"Skol 600ml",preco:10},{nome:"Subzero 600ml",preco:8},  
-    {nome:"Amstel 600ml",preco:9},{nome:"Crystal 600ml",preco:6},{nome:"Lokal 600ml",preco:6},{nome:"Heineken 600ml",preco:12},  
-    {nome:"Budweiser 600ml",preco:10},{nome:"Original 600ml",preco:10},{nome:"Antarctica 600ml",preco:8},  
-    {nome:"Itaipava 600ml",preco:7},{nome:"Itaipava Premium",preco:9},{nome:"Petra 600ml",preco:8}  
-  ],  
-  "Energéticos/Outros":[  
-    {nome:"Tnt 269ML",preco:8},{nome:"Tnt 473ML",preco:10},{nome:"Monster",preco:14},{nome:"Redbull",preco:10},  
-    {nome:"Água mineral",preco:3},{nome:"Água com gás",preco:4},{nome:"Agua de coco",preco:7},  
-    {nome:"H2o 500Ml",preco:7},{nome:"H2o 1,5 L",preco:10},{nome:"Skinka uva",preco:5},  
-    {nome:"Skinka laranja",preco:5},{nome:"Skinka morango",preco:5},{nome:"Beats frutas verdes",preco:7}  
-  ],  
-  "Porções":[  
-    {nome:"Mandioca 1",preco:1},{nome:"Mandioca 3",preco:3},{nome:"Mandioca 5",preco:5},{nome:"Mandioca 10",preco:10},  
-    {nome:"Feijão farofado 1",preco:1},{nome:"Feijão farofado 3",preco:3},{nome:"Feijão farofado 5",preco:5},  
-    {nome:"Feijão farofado 10",preco:10},{nome:"Vinagrete",preco:0},{nome:"Vinagrete entrega",preco:2}  
-  ]  
-};  
-  
-// ================= MOSTRAR PRODUTOS =================  
-function mostrarProdutosPorCategoria(){  
-  const div = document.getElementById("produtos");  
-  div.innerHTML = "";  
-  Object.keys(categorias).forEach(cat => {  
-    const catDiv = document.createElement("div");  
-    catDiv.className = "categoria";  
-    const header = document.createElement("h4");  
-    header.textContent = cat;  
-    header.onclick = () => {  
-      const collapse = catDiv.querySelector(".collapse");  
-      collapse.style.display = (collapse.style.display === "none" ? "block" : "none");  
-    };  
-    catDiv.appendChild(header);  
-  
-    const listDiv = document.createElement("div");  
-    listDiv.className = "collapse";  
-    listDiv.style.display = "none";  
-  
-    categorias[cat].forEach(prod => {  
-      const prodDiv = document.createElement("div");  
-      prodDiv.className = "produto";  
-      prodDiv.innerHTML = `  
-        ${prod.nome} - R$${prod.preco}   
-        <button>+</button>  
-      `;  
-      prodDiv.querySelector("button").onclick = () => {  
-        if(!mesaSelecionada) {  
-          alert("Selecione uma mesa primeiro!");  
-          return;  
-        }  
-        const itemRef = ref(db, "mesas/"+hoje+"/"+mesaSelecionada+"/itens/"+prod.nome);  
-        onValue(itemRef, snapshot => {  
-          let qtd = snapshot.exists()? snapshot.val().quantidade : 0;  
-          set(itemRef, {nome: prod.nome, preco: prod.preco, quantidade: qtd+1});  
-        }, {onlyOnce:true});  
-  
-        window.mostrarToast(prod.nome + " adicionado!");  
-      };  
-      listDiv.appendChild(prodDiv);  
-    });  
-  
-    catDiv.appendChild(listDiv);  
-    div.appendChild(catDiv);  
-  });  
-}  
-  
-mostrarProdutosPorCategoria();  
-  
-// ================= CRIAR MESA =================  
-window.criarMesa = function(){  
-  const nome = document.getElementById("nomeMesa").value;  
-  if(!nome) return alert("Digite o nome da mesa!");  
-  push(mesasRef, {nome, itens:{}});  
-  document.getElementById("nomeMesa").value = "";  
-}  
-  
-// ================= MOSTRAR MESAS =================  
-function atualizarMesas(){  
-  onValue(mesasRef, snapshot => {  
-    const data = snapshot.val();  
-    const div = document.getElementById("mesas");  
-    div.innerHTML = "";  
-    if(data){  
-      Object.keys(data).forEach(id => {  
-        const itens = data[id].itens || {};  
-        let total = 0;  
-        let detalhes = "";  
-        Object.values(itens).forEach(item => {  
-          total += item.preco * item.quantidade;  
-          detalhes += `${item.nome} x${item.quantidade} | `;  
-        });  
-  
-        const mesaDiv = document.createElement("div");  
-        mesaDiv.className = "mesa";  
-        mesaDiv.dataset.id = id;  
-        mesaDiv.innerHTML = `  
-          <strong>${data[id].nome}</strong><br>  
-          ${detalhes}<br>  
-          Total: <span class="total">R$${total}</span><br>  
-          <button class="fecharConta">Fechar Conta</button>  
-        `;  
-  
-        mesaDiv.onclick = (e) => {  
-          if(e.target.classList.contains("fecharConta")) return;  
-          mesaSelecionada = id;  
-          document.querySelectorAll(".mesa").forEach(m => m.classList.remove("selecionada"));  
-          mesaDiv.classList.add("selecionada");  
-        }  
-  
-        mesaDiv.querySelector(".fecharConta").onclick = (e) => {  
-          e.stopPropagation();  
-          if(confirm(`Fechar conta da mesa "${data[id].nome}"?\nTotal: R$${total}`)){  
-            const registro = {  
-              nome: data[id].nome,  
-              itens: data[id].itens,  
-              total: total,  
-              fechadoEm: new Date().toLocaleString()  
-            };  
-            push(historicoRef, registro);  
-            remove(ref(db, "mesas/"+hoje+"/"+id));  
-            if(mesaSelecionada===id) mesaSelecionada = null;  
-          }  
-        }  
-  
-        div.appendChild(mesaDiv);  
-      });  
-    }  
-  });  
-}  
-  
-atualizarMesas();  
-  
-// ================= HISTÓRICO E RESUMO =================  
-onValue(historicoRef, snapshot => {  
-  const data = snapshot.val();  
-  const div = document.getElementById("historico");  
-  const resumoDiv = document.getElementById("resumoDia");  
-  
-  div.innerHTML = "";  
-  resumoDiv.innerHTML = "";  
-  
-  if(!data){  
-    div.innerHTML = "<p style='color:lightgray;'>Nenhum histórico por hoje.</p>";  
-    resumoDiv.innerHTML = "<p style='color:lightgray;'>Nenhuma venda hoje.</p>";  
-    return;  
-  }  
-  
-  let totalDia = 0;  
-  let quantidadeMesas = 0;  
-  
-  Object.values(data).forEach(mesa => {  
-    quantidadeMesas++;  
-    totalDia += mesa.total;  
-  
-    const itens = mesa.itens || {};  
-    let detalhes = "";  
-    Object.values(itens).forEach(item => {  
-      detalhes += `${item.nome} x${item.quantidade} | `;  
-    });  
-  
-    const histDiv = document.createElement("div");  
-    histDiv.className = "historicoMesa";  
-    histDiv.innerHTML = `  
-      <strong>${mesa.nome}</strong><br>  
-      ${detalhes}<br>  
-      <span class="total">R$${mesa.total}</span><br>  
-      <small style="color:lightgray;">Fechado em: ${mesa.fechadoEm}</small>  
-    `;  
-    div.appendChild(histDiv);  
-  });  
-  
-  const media = (totalDia / quantidadeMesas).toFixed(2);  
-  
-  resumoDiv.innerHTML = `  
-    <div class="mesa">  
-      💰 Total vendido hoje: <span class="total">R$${totalDia}</span><br>  
-      🧾 Contas fechadas: ${quantidadeMesas}<br>  
-      📈 Média por mesa: R$${media}  
-    </div>  
-  `;  
-});  
-  
-// ================= PESQUISA DE PRODUTOS =================  
-window.filtrarProdutos = function(){  
-  const filtro = document.getElementById("pesquisa").value.toLowerCase();  
-  document.querySelectorAll(".produto").forEach(prod => {  
-    const nome = prod.textContent.toLowerCase();  
-    prod.style.display = nome.includes(filtro)? "flex":"none";  
-  });  
-}  
-</script>  </body>  
-</html>    };
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Comanda Profissional</title>
+<style>
+body{background:#0f0f0f;color:white;font-family:Arial;margin:0;padding:20px}
+h1,h2{color:#00aaff}
+button{background:#00aaff;border:none;padding:6px 10px;margin:3px;color:black;font-weight:bold;border-radius:6px;cursor:pointer}
+button:hover{opacity:0.8}
+input{padding:8px;border-radius:6px;border:none;margin:5px 0}
+.card{background:#1c1c1c;padding:15px;border-radius:10px;margin-bottom:15px}
+.item{display:flex;justify-content:space-between;margin:4px 0;flex-wrap:wrap}
+.categoria{margin-top:20px;color:#00aaff}
+</style>
+</head>
+<body>
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
+<h1>🧾 Sistema de Comanda</h1>
 
-const hoje = new Date().toISOString().split('T')[0];
-const mesasRef = ref(db, "mesas/"+hoje);
-const historicoRef = ref(db, "historico/"+hoje);
+<h3>Criar Mesa</h3>
+<input type="text" id="novaMesa" placeholder="Nome ou número da mesa">
+<button onclick="criarMesa()">Criar</button>
 
-let mesaSelecionada = null;
+<hr>
 
-window.mostrarToast = function(msg){
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),1500);
+<h3>Pesquisar Item</h3>
+<input type="text" id="search" placeholder="Pesquisar...">
+
+<div id="cardapio"></div>
+
+<hr>
+<h2>Mesas</h2>
+<div id="mesas"></div>
+
+<hr>
+<h2>Histórico</h2>
+<div id="historico"></div>
+<h3>Total Geral Fechado: R$ <span id="totalGeral">0</span></h3>
+
+<script>
+let categorias = {
+"Espetos":[
+["Gado",6],["Porco",6],["Frango com osso",6],["Frango com bacon",6],
+["Coração",6],["Calabresa apimentada",6],["Calabresa defumada",6],
+["Pão de alho",6],["Queijo com bacon",7]
+],
+
+"Refris":[
+["Sukita laranja 1L",8],["Sukita laranja 2L",11],["It! Guaraná",8],
+["It! Coca",8],["It! Laranja",8],["Pepsi 2L",10],["Pepsi 2L zero",10],
+["Pepsi 1L",8],["Guaraná Lata",5],["Guaraná 1L",8],["Guaraná 2L",13],
+["Sukita uva 2L",11],["Coca lata",5],["Coca 1L",9],["Coca LS",8],
+["Coca 2L",14],["Fys em geral",5],["It em geral",4],
+["Pepsi zero lata",4],["Guaraná zero",4],["Sukita uva",4],
+["Sukita laranja",4],["Soda limonada",4]
+],
+
+"Cerveja lata/piriguete":[
+["Skol",5],["Subzero",5],["Brahma",5],["Amstel",5],["Devassa",5],
+["Lokal",4],["Antártica",5],["Crystal",5],["Caracu",7],
+["Original",6],["Crystal baden",5],["Black princess",5],
+["Brahma zero",5],["Brahma piriguete",5],["Skol piriguete",5],
+["Original piriguete",5],["Crystal piriguete",5],["Petra piriguete",5]
+],
+
+"Long neck":[
+["Heineken",9],["Budweiser",8],["Budweiser zero",8],
+["Itaipava zero",8],["Cabaré limão",8],["Cabaré frutas vermelhas",8]
+],
+
+"Cervejas 600ML":[
+["Brahma 600ml",10],["Skol 600ml",10],["Subzero 600ml",8],
+["Amstel 600ml",9],["Crystal 600ml",6],["Lokal 600ml",6],
+["Heineken 600ml",12],["Budweiser 600ml",10],
+["Original 600ml",10],["Antarctica 600ml",9],
+["Itaipava 600ml",7],["Itaipava Premium",9],["Petra",8]
+],
+
+"Energético/outros":[
+["TNT 269ML",8],["TNT 473ML",10],["Monster",14],
+["Redbull",10],["Água mineral",3],["Água com gás",4],
+["Água de coco",7],["H2O 500ML",7],["H2O 1,5L",10],
+["Skinka uva",5],["Skinka laranja",5],
+["Skinka morango",5],["Beats frutas verdes",7]
+],
+
+"Porções":[
+["Mandioca P",1],["Mandioca M",3],["Mandioca G",5],["Mandioca GG",10],
+["Feijão farofado P",1],["Feijão farofado M",3],
+["Feijão farofado G",5],["Feijão farofado GG",10],
+["Vinagrete",0]
+]
 };
 
-const categorias = {
-  "Espetos":[
-    {nome:"Gado",preco:6},
-    {nome:"Porco",preco:6},
-    {nome:"Frango com osso",preco:6},
-    {nome:"Frango com bacon",preco:6}
-  ]
-};
+let mesas = {};
+let totalGeral = 0;
 
-function mostrarProdutos(){
-  const div = document.getElementById("produtos");
-  div.innerHTML="";
-
-  Object.keys(categorias).forEach(cat=>{
-    const catDiv=document.createElement("div");
-    catDiv.className="categoria";
-
-    const header=document.createElement("h4");
-    header.textContent=cat;
-    header.onclick=()=>listDiv.style.display=listDiv.style.display==="none"?"block":"none";
-    catDiv.appendChild(header);
-
-    const listDiv=document.createElement("div");
-    listDiv.style.display="none";
-
-    categorias[cat].forEach(prod=>{
-      const prodDiv=document.createElement("div");
-      prodDiv.className="produto";
-
-      prodDiv.innerHTML=`
-        <span>${prod.nome} - R$${prod.preco}</span>
-        <div class="botoes">
-          <button class="menos">-</button>
-          <button class="mais">+</button>
-        </div>
-      `;
-
-      const itemRef=()=>ref(db,"mesas/"+hoje+"/"+mesaSelecionada+"/itens/"+prod.nome);
-
-      prodDiv.querySelector(".mais").onclick=()=>{
-        if(!mesaSelecionada){alert("Selecione uma mesa!");return;}
-        onValue(itemRef(),snap=>{
-          let qtd=snap.exists()?snap.val().quantidade:0;
-          set(itemRef(),{nome:prod.nome,preco:prod.preco,quantidade:qtd+1});
-        },{onlyOnce:true});
-        mostrarToast(prod.nome+" +1");
-      };
-
-      prodDiv.querySelector(".menos").onclick=()=>{
-        if(!mesaSelecionada){alert("Selecione uma mesa!");return;}
-        onValue(itemRef(),snap=>{
-          if(!snap.exists())return;
-          let dados=snap.val();
-          let novaQtd=dados.quantidade-1;
-          if(novaQtd<=0){
-            remove(itemRef());
-            mostrarToast(prod.nome+" removido");
-          }else{
-            set(itemRef(),{nome:prod.nome,preco:prod.preco,quantidade:novaQtd});
-            mostrarToast(prod.nome+" -1");
-          }
-        },{onlyOnce:true});
-      };
-
-      listDiv.appendChild(prodDiv);
-    });
-
-    catDiv.appendChild(listDiv);
-    div.appendChild(catDiv);
-  });
+function renderCardapio(){
+let div=document.getElementById("cardapio");
+div.innerHTML="";
+for(let categoria in categorias){
+div.innerHTML+=`<div class="categoria"><h3>${categoria}</h3></div>`;
+categorias[categoria].forEach(item=>{
+div.innerHTML+=`
+<div class="item">
+${item[0]} - R$ ${item[1]}
+<button onclick="addItem('${item[0]}',${item[1]})">+</button>
+</div>`;
+});
+}
 }
 
-mostrarProdutos();
+function criarMesa(){
+let nome=document.getElementById("novaMesa").value;
+if(!nome)return;
+mesas[nome]=[];
+renderMesas();
+document.getElementById("novaMesa").value="";
+}
 
-window.criarMesa=function(){
-  const nome=document.getElementById("nomeMesa").value;
-  if(!nome)return alert("Digite o nome!");
-  push(mesasRef,{nome,itens:{}});
-  document.getElementById("nomeMesa").value="";
-};
+function addItem(nome,preco){
+let mesa=prompt("Adicionar em qual mesa?");
+if(!mesas[mesa])return alert("Mesa não existe");
+let existente=mesas[mesa].find(i=>i.nome===nome);
+if(existente){existente.qtd++}
+else{mesas[mesa].push({nome,preco,qtd:1})}
+renderMesas();
+}
 
-onValue(mesasRef,snap=>{
-  const data=snap.val();
-  const div=document.getElementById("mesas");
-  div.innerHTML="";
-  if(data){
-    Object.keys(data).forEach(id=>{
-      let total=0;
-      let detalhes="";
-      const itens=data[id].itens||{};
-      Object.values(itens).forEach(item=>{
-        total+=item.preco*item.quantidade;
-        detalhes+=`${item.nome} x${item.quantidade} | `;
-      });
+function alterarQtd(mesa,index,delta){
+mesas[mesa][index].qtd+=delta;
+if(mesas[mesa][index].qtd<=0)mesas[mesa].splice(index,1);
+renderMesas();
+}
 
-      const mesaDiv=document.createElement("div");
-      mesaDiv.className="mesa";
-      mesaDiv.innerHTML=`
-        <strong>${data[id].nome}</strong><br>
-        ${detalhes}<br>
-        Total: <span class="total">R$${total}</span><br>
-        <button class="fecharConta">Fechar Conta</button>
-      `;
+function removerItem(mesa,index){
+mesas[mesa].splice(index,1);
+renderMesas();
+}
 
-      mesaDiv.onclick=(e)=>{
-        if(e.target.classList.contains("fecharConta"))return;
-        mesaSelecionada=id;
-        document.querySelectorAll(".mesa").forEach(m=>m.classList.remove("selecionada"));
-        mesaDiv.classList.add("selecionada");
-      };
+function totalMesa(mesa){
+return mesas[mesa].reduce((t,i)=>t+(i.preco*i.qtd),0);
+}
 
-      mesaDiv.querySelector(".fecharConta").onclick=(e)=>{
-        e.stopPropagation();
-        push(historicoRef,{
-          nome:data[id].nome,
-          itens:data[id].itens,
-          total:total,
-          fechadoEm:new Date().toLocaleString()
-        });
-        remove(ref(db,"mesas/"+hoje+"/"+id));
-        if(mesaSelecionada===id)mesaSelecionada=null;
-      };
+function fecharConta(mesa){
+let total=totalMesa(mesa);
+totalGeral+=total;
+document.getElementById("totalGeral").innerText=totalGeral.toFixed(2);
+document.getElementById("historico").innerHTML+=
+`<div class="card">Mesa ${mesa} - R$ ${total.toFixed(2)}</div>`;
+mesas[mesa]=[];
+renderMesas();
+}
 
-      div.appendChild(mesaDiv);
-    });
-  }
+function renderMesas(){
+let div=document.getElementById("mesas");
+div.innerHTML="";
+for(let mesa in mesas){
+let total=totalMesa(mesa);
+div.innerHTML+=`<div class="card"><h3>Mesa ${mesa}</h3>`;
+mesas[mesa].forEach((item,i)=>{
+div.innerHTML+=`
+<div class="item">
+${item.nome} x${item.qtd} - R$ ${(item.preco*item.qtd).toFixed(2)}
+<div>
+<button onclick="alterarQtd('${mesa}',${i},1)">+</button>
+<button onclick="alterarQtd('${mesa}',${i},-1)">-</button>
+<button onclick="removerItem('${mesa}',${i})">X</button>
+</div>
+</div>`;
+});
+div.innerHTML+=`
+<h4>Total: R$ ${total.toFixed(2)}</h4>
+<button onclick="fecharConta('${mesa}')">Fechar Conta</button>
+</div>`;
+}
+}
+
+document.getElementById("search").addEventListener("input",function(){
+let filtro=this.value.toLowerCase();
+document.querySelectorAll("#cardapio .item").forEach(item=>{
+item.style.display=item.textContent.toLowerCase().includes(filtro)?"flex":"none";
+});
 });
 
-onValue(historicoRef,snap=>{
-  const data=snap.val();
-  const div=document.getElementById("historico");
-  const resumo=document.getElementById("resumoDia");
-  div.innerHTML="";
-  resumo.innerHTML="";
-
-  if(!data){
-    div.innerHTML="<p style='color:lightgray;'>Nenhum histórico hoje.</p>";
-    resumo.innerHTML="<p style='color:lightgray;'>Nenhuma venda hoje.</p>";
-    return;
-  }
-
-  let totalDia=0;
-  let qtdMesas=0;
-
-  Object.values(data).forEach(mesa=>{
-    qtdMesas++;
-    totalDia+=mesa.total;
-
-    let detalhes="";
-    Object.values(mesa.itens||{}).forEach(item=>{
-      detalhes+=`${item.nome} x${item.quantidade} | `;
-    });
-
-    const histDiv=document.createElement("div");
-    histDiv.className="historicoMesa";
-    histDiv.innerHTML=`
-      <strong>${mesa.nome}</strong><br>
-      ${detalhes}<br>
-      <span class="total">R$${mesa.total}</span><br>
-      <small style="color:lightgray;">${mesa.fechadoEm}</small>
-    `;
-    div.appendChild(histDiv);
-  });
-
-  const media=(totalDia/qtdMesas).toFixed(2);
-
-  resumo.innerHTML=`
-    <div class="mesa">
-      💰 Total vendido hoje: <span class="total">R$${totalDia}</span><br>
-      🧾 Contas fechadas: ${qtdMesas}<br>
-      📈 Média por mesa: R$${media}
-    </div>
-  `;
-});
-
-window.filtrarProdutos=function(){
-  const filtro=document.getElementById("pesquisa").value.toLowerCase();
-  document.querySelectorAll(".produto").forEach(p=>{
-    p.style.display=p.textContent.toLowerCase().includes(filtro)?"flex":"none";
-  });
-};
+renderCardapio();
 </script>
+</body>
+</html>
