@@ -390,7 +390,7 @@ function gerarPix(valorTotal, nomeMesa){
     format("53", "986") +
     format("54", valor) +
     format("58", "BR") +
-    format("59", nome) +
+    format("59", nome.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, ''))
     format("60", cidade) +
     format("62", format("05", nomeMesa)) +
     "6304";
