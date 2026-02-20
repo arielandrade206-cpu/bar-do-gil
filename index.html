@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
 <link rel="manifest" href="manifest.json">
@@ -384,16 +384,16 @@ function gerarPix(valorTotal, nomeMesa){
   const merchantAccount = format("26", gui + chavePix);
 
   const payload =
-    format("00", "01") +
-    merchantAccount +
-    format("52", "0000") +
-    format("53", "986") +
-    format("54", valor) +
-    format("58", "BR") +
-    format("59", nome.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, ''))
-    format("60", cidade) +
-    format("62", format("05", nomeMesa)) +
-    "6304";
+  format("00", "01") +
+  merchantAccount +
+  format("52", "0000") +
+  format("53", "986") +
+  format("54", valor) +
+  format("58", "BR") +
+  format("59", nome.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, '')) +
+  format("60", cidade) +
+  format("62", format("05", nomeMesa)) +
+  "6304";
 
   const codigo = payload + crc16(payload);
 
