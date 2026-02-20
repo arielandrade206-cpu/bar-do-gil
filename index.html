@@ -354,47 +354,50 @@ window.filtrarProdutos = function(){
 
 function gerarPix(valorTotal, nomeMesa){
 
-  let valor = valorTotal.toFixed(2);
+  const chave = "77981208309";
+  const nome = "GILSON RODRIGUES AMADO";
+  const cidade = "IUIU";
+  const valor = valorTotal.toFixed(2);
 
-  let chave = "77981208309";
-  let nome = "GILSON RODRIGUES AMADO";
-  let cidade = "IUIU";
-
-  function montarPix(chave, nome, cidade, valor) {
-
-    let chaveFormatada = 
-        "0014BR.GOV.BCB.PIX" +
-        "01" + chave.length.toString().padStart(2,"0") + chave;
-
-    let payload =
-        "000201" +
-        "26" + chaveFormatada.length.toString().padStart(2,"0") + chaveFormatada +
-        "52040000" +
-        "5303986" +
-        "54" + valor.length.toString().padStart(2,"0") + valor +
-        "5802BR" +
-        "59" + nome.length.toString().padStart(2,"0") + nome +
-        "60" + cidade.length.toString().padStart(2,"0") + cidade +
-        "62070503" + nomeMesa.length.toString().padStart(2,"0") + nomeMesa +
-        "6304";
-
-    return payload + crc16(payload);
-}
-
-  function crc16(str) {
-      let crc = 0xFFFF;
-      for (let c = 0; c < str.length; c++) {
-          crc ^= str.charCodeAt(c) << 8;
-          for (let i = 0; i < 8; i++) {
-              crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
-          }
-      }
-      return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4,'0');
+  function format(id, value){
+    return id + value.length.toString().padStart(2,'0') + value;
   }
 
-  let codigo = montarPix(chave, nome, cidade, valor);
+  function crc16(payload) {
+    let polinomio = 0x1021;
+    let resultado = 0xFFFF;
 
-  let qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(codigo);
+    for (let i = 0; i < payload.length; i++) {
+      resultado ^= (payload.charCodeAt(i) << 8);
+      for (let j = 0; j < 8; j++) {
+        if ((resultado <<= 1) & 0x10000) resultado ^= polinomio;
+        resultado &= 0xFFFF;
+      }
+    }
+    return resultado.toString(16).toUpperCase().padStart(4, '0');
+  }
+
+  // ===== MONTA PAYLOAD =====
+
+  const gui = format("00", "BR.GOV.BCB.PIX");
+  const chavePix = format("01", chave);
+  const merchantAccount = format("26", gui + chavePix);
+
+  const payload =
+    format("00", "01") +
+    merchantAccount +
+    format("52", "0000") +
+    format("53", "986") +
+    format("54", valor) +
+    format("58", "BR") +
+    format("59", nome) +
+    format("60", cidade) +
+    format("62", format("05", nomeMesa)) +
+    "6304";
+
+  const codigo = payload + crc16(payload);
+
+  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(codigo);
 
   const janela = window.open("", "Pix", "width=350,height=500");
   janela.document.write(`
