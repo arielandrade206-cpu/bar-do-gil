@@ -242,39 +242,48 @@ function atualizarMesas(){
         const mesaDiv = document.createElement("div");
         mesaDiv.className = "mesa";
         mesaDiv.dataset.id = id;
-       mesaDiv.innerHTML = `
-  <strong>${data[id].nome}</strong><br>
-  ${detalhes}<br>
-  Total: <span class="total">R$${total}</span><br>
-  <button class="fecharConta">Fechar Conta</button>
-  <button class="pixBtn">💳 Pix</button>
-`;
 
+        mesaDiv.innerHTML = `
+          <strong>${data[id].nome}</strong><br>
+          ${detalhes}<br>
+          Total: <span class="total">R$${total}</span><br>
+          <button class="pixBtn">💳 Pix</button>
+          <button class="fecharConta">Fechar Conta</button>
+        `;
+
+        // Selecionar mesa
         mesaDiv.onclick = (e) => {
-          if(e.target.classList.contains("fecharConta")) return;
+          if(e.target.tagName === "BUTTON") return;
           mesaSelecionada = id;
           document.querySelectorAll(".mesa").forEach(m => m.classList.remove("selecionada"));
           mesaDiv.classList.add("selecionada");
-        }
+        };
 
-        mesaDiv.querySelector(".fecharConta").onclick = (e) => {
-       mesaDiv.querySelector(".pixBtn").onclick = (e) => {
-  e.stopPropagation();
-  gerarPix(total, data[id].nome);
-}; 
+        // BOTÃO PIX (AGORA FORA DO FECHAR CONTA)
+        mesaDiv.querySelector(".pixBtn").onclick = (e) => {
           e.stopPropagation();
+          gerarPix(total, data[id].nome);
+        };
+
+        // BOTÃO FECHAR CONTA
+        mesaDiv.querySelector(".fecharConta").onclick = (e) => {
+          e.stopPropagation();
+
           if(confirm(`Fechar conta da mesa "${data[id].nome}"?\nTotal: R$${total}`)){
             const registro = {
               nome: data[id].nome,
               itens: data[id].itens,
               total: total,
+              pagamento: "Pix ou Dinheiro",
               fechadoEm: new Date().toLocaleString()
             };
+
             push(historicoRef, registro);
             remove(ref(db, "mesas/"+hoje+"/"+id));
+
             if(mesaSelecionada===id) mesaSelecionada = null;
           }
-        }
+        };
 
         div.appendChild(mesaDiv);
       });
