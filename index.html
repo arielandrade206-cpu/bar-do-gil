@@ -377,27 +377,29 @@ function gerarPix(valorTotal, nomeMesa){
     return resultado.toString(16).toUpperCase().padStart(4, '0');
   }
 
-  // ===== MONTA PAYLOAD =====
-
   const gui = format("00", "BR.GOV.BCB.PIX");
   const chavePix = format("01", chave);
   const merchantAccount = format("26", gui + chavePix);
 
-  const payload =
-  format("00", "01") +
-  merchantAccount +
-  format("52", "0000") +
-  format("53", "986") +
-  format("54", valor) +
-  format("58", "BR") +
-  format("59", nome.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, '')) +
-  format("60", cidade) +
-  format("62", format("05", nomeMesa)) +
-  "6304";
+  const nomeLimpo = nome.trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+  const cidadeLimpa = cidade.trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+  const txid = nomeMesa.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
 
-  const codigo = payload + crc16(payload);
+  const payloadSemCRC =
+    format("00", "01") +
+    merchantAccount +
+    format("52", "0000") +
+    format("53", "986") +
+    format("54", valor) +
+    format("58", "BR") +
+    format("59", nomeLimpo) +
+    format("60", cidadeLimpa) +
+    format("62", format("05", txid)) +
+    "6304";
 
-  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(codigo);
+  const codigo = payloadSemCRC + crc16(payloadSemCRC);
+
+  let qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(codigo);
 
   const janela = window.open("", "Pix", "width=350,height=500");
   janela.document.write(`
