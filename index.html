@@ -242,12 +242,13 @@ function atualizarMesas(){
         const mesaDiv = document.createElement("div");
         mesaDiv.className = "mesa";
         mesaDiv.dataset.id = id;
-        mesaDiv.innerHTML = `
-          <strong>${data[id].nome}</strong><br>
-          ${detalhes}<br>
-          Total: <span class="total">R$${total}</span><br>
-          <button class="fecharConta">Fechar Conta</button>
-        `;
+       mesaDiv.innerHTML = `
+  <strong>${data[id].nome}</strong><br>
+  ${detalhes}<br>
+  Total: <span class="total">R$${total}</span><br>
+  <button class="fecharConta">Fechar Conta</button>
+  <button class="pixBtn">💳 Pix</button>
+`;
 
         mesaDiv.onclick = (e) => {
           if(e.target.classList.contains("fecharConta")) return;
@@ -257,6 +258,10 @@ function atualizarMesas(){
         }
 
         mesaDiv.querySelector(".fecharConta").onclick = (e) => {
+       mesaDiv.querySelector(".pixBtn").onclick = (e) => {
+  e.stopPropagation();
+  gerarPix(total, data[id].nome);
+}; 
           e.stopPropagation();
           if(confirm(`Fechar conta da mesa "${data[id].nome}"?\nTotal: R$${total}`)){
             const registro = {
@@ -337,9 +342,62 @@ window.filtrarProdutos = function(){
     prod.style.display = nome.includes(filtro)? "flex":"none";
   });
 }
+
+function gerarPix(valorTotal, nomeMesa){
+
+  let valor = valorTotal.toFixed(2);
+
+  let chave = "77981208309";
+  let nome = "GILSON RODRIGUES AMADO";
+  let cidade = "IUIU";
+
+  function montarPix(chave, nome, cidade, valor) {
+      let pix =
+          "000201" +
+          "26360014BR.GOV.BCB.PIX0114" + chave.length.toString().padStart(2,"0") + chave +
+          "52040000" +
+          "5303986" +
+          "54" + valor.length.toString().padStart(2,"0") + valor +
+          "5802BR" +
+          "59" + nome.length.toString().padStart(2,"0") + nome +
+          "60" + cidade.length.toString().padStart(2,"0") + cidade +
+          "62070503" + nomeMesa.length.toString().padStart(2,"0") + nomeMesa +
+          "6304";
+
+      return pix + crc16(pix);
+  }
+
+  function crc16(str) {
+      let crc = 0xFFFF;
+      for (let c = 0; c < str.length; c++) {
+          crc ^= str.charCodeAt(c) << 8;
+          for (let i = 0; i < 8; i++) {
+              crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+          }
+      }
+      return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4,'0');
+  }
+
+  let codigo = montarPix(chave, nome, cidade, valor);
+
+  let qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(codigo);
+
+  const janela = window.open("", "Pix", "width=350,height=500");
+  janela.document.write(`
+    <div style="font-family:Arial;text-align:center;">
+      <h3>Pagamento Pix</h3>
+      <p>Mesa: ${nomeMesa}</p>
+      <p>Total: R$${valor}</p>
+      <img src="${qrUrl}">
+      <textarea style="width:90%;height:80px;">${codigo}</textarea>
+      <br><br>
+      <button onclick="window.close()">Fechar</button>
+    </div>
+  `);
+}
+
 </script>
 
 </body>
 </html>
 	
-
