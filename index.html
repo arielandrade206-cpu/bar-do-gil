@@ -9,37 +9,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bar do Gil - Sistema PRO</title>
 <style>
-body{font-family:Arial;background:#0f172a;color:white;margin:0;padding:10px;}
-h1,h3{text-align:center;color:#38bdf8;}
-input,button{padding:8px;margin:5px 0;border-radius:8px;border:none;font-size:16px;}
-button{background:#2563eb;color:white;cursor:pointer;}
-.mesa, .historicoMesa{background:#1e293b;padding:10px;margin:5px 0;border-radius:10px;}
-.mesa.selecionada{border:2px solid #22c55e;}
-.total{color:#22c55e;font-weight:bold;}
-.categoria{background:#334155;margin:5px 0;border-radius:6px;}
-.categoria h4{margin:0;padding:10px;cursor:pointer;background:#1e293b;border-radius:6px;}
-.produto{padding:5px 10px;display:flex;justify-content: space-between;border-bottom:1px solid #1e293b;}
-.produto button{background:#16a34a;border-radius:5px;padding:3px 8px;margin-left:5px;}
-.produto:last-child{border-bottom:none;}
-/* TOAST CONFIRMAÇÃO */
+
+/* ===== PALETA NEON BAR DO GIL ===== */
+:root{
+  --cor-fundo: #0D1B2A;      /* Fundo azul quase preto */
+  --cor-texto: #FFFFFF;     /* Texto branco */
+  --cor-titulo: #00B4FF;    /* Títulos neon */
+
+  --cor-card: #1B263B;      /* Cards */
+  --cor-categoria: #1B263B; /* Mesma base dos cards */
+
+  --cor-botao: #00B4FF;     /* Botão principal */
+  --cor-botao-add: #00B4FF; /* Botão adicionar */
+
+  --cor-remover: #FF4D4D;   /* Botão remover */
+  --cor-destaque: #00B4FF;  /* Seleção e detalhes */
+
+  --cor-borda: #243447;     /* Bordas internas suaves */
+}
+
+/* ===== GERAL ===== */
+body{
+  font-family:Arial;
+  background:var(--cor-fundo);
+  color:var(--cor-texto);
+  margin:0;
+  padding:10px;
+}
+
+h1,h3{
+  text-align:center;
+  color:var(--cor-titulo);
+}
+
+input,button{
+  padding:8px;
+  margin:5px 0;
+  border-radius:8px;
+  border:none;
+  font-size:16px;
+}
+
+button{
+  background:var(--cor-botao);
+  color:white;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  opacity:.85;
+}
+
+/* ===== MESAS ===== */
+.mesa, .historicoMesa{
+  background:var(--cor-card);
+  padding:10px;
+  margin:5px 0;
+  border-radius:10px;
+}
+
+.mesa.selecionada{
+  border:2px solid var(--cor-destaque);
+  box-shadow:0 0 10px var(--cor-destaque);
+}
+
+.total{
+  color:var(--cor-destaque);
+  font-weight:bold;
+}
+
+/* ===== CATEGORIAS ===== */
+.categoria{
+  background:var(--cor-categoria);
+  margin:5px 0;
+  border-radius:6px;
+}
+
+.categoria h4{
+  margin:0;
+  padding:10px;
+  cursor:pointer;
+  background:var(--cor-card);
+  border-radius:6px;
+}
+
+/* ===== PRODUTOS ===== */
+.produto{
+  padding:5px 10px;
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid var(--cor-borda);
+}
+
+.produto button{
+  background:var(--cor-botao-add);
+  border-radius:5px;
+  padding:3px 8px;
+  margin-left:5px;
+}
+
+/* BOTÃO REMOVER */
+.btn-remover{
+  background:var(--cor-remover) !important;
+}
+
+/* ===== TOAST ===== */
 .toast{
   position:fixed;
   top:20px;
   right:20px;
-  background:#22c55e;
+  background:var(--cor-destaque);
   color:white;
   padding:12px 18px;
   border-radius:10px;
   font-weight:bold;
   opacity:0;
   transform:translateY(-20px);
-  transition:all .3s ease;
+  transition:.3s;
   z-index:9999;
 }
+
 .toast.show{
   opacity:1;
   transform:translateY(0);
 }
+
 </style>
 </head>
 <body>
