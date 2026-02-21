@@ -261,64 +261,108 @@ const categorias = {
 
 // ================= MOSTRAR PRODUTOS =================
 function mostrarProdutosPorCategoria() {
+
   const div = document.getElementById("produtos");
   div.innerHTML = "";
-  
+
   Object.keys(categorias).forEach(cat => {
+
     const catDiv = document.createElement("div");
     catDiv.className = "categoria";
-    
-     header.onclick = () => {
 
-  const todas = document.querySelectorAll(".collapse");
+    const header = document.createElement("h4");
 
-  // Fecha todas primeiro
-  todas.forEach(c => c.style.display = "none");
+    const titulo = document.createElement("span");
+    titulo.textContent = cat;
 
-  const collapse = catDiv.querySelector(".collapse");
+    const seta = document.createElement("span");
+    seta.innerHTML = "▼";
 
-  // Se estava fechada, abre
-  if(collapse.style.display === "none"){
-    collapse.style.display = "block";
-  }
-   
- catDiv.appendChild(header);
+    header.appendChild(titulo);
+    header.appendChild(seta);
 
     const listDiv = document.createElement("div");
     listDiv.className = "collapse";
-    listDiv.style.display = "none";
+
+    header.onclick = () => {
+
+      const todasCategorias = document.querySelectorAll(".categoria");
+      const todasCollapses = document.querySelectorAll(".collapse");
+
+      todasCategorias.forEach(c => c.classList.remove("aberta"));
+
+      todasCollapses.forEach(c => {
+        if(c !== listDiv){
+          c.style.maxHeight = null;
+        }
+      });
+
+      if(listDiv.style.maxHeight){
+        listDiv.style.maxHeight = null;
+        seta.style.transform = "rotate(0deg)";
+        catDiv.classList.remove("aberta");
+      } else {
+        listDiv.style.maxHeight = listDiv.scrollHeight + "px";
+        seta.style.transform = "rotate(180deg)";
+        catDiv.classList.add("aberta");
+      }
+    };
 
     categorias[cat].forEach(prod => {
+
       const prodDiv = document.createElement("div");
       prodDiv.className = "produto";
+
       prodDiv.innerHTML = `
-        ${prod.nome} - R$${prod.preco} 
-        <button class="add">+</button>
-        <button class="remove">–</button>
+        ${prod.nome} - R$${prod.preco}
+        <div>
+          <button class="add">+</button>
+          <button class="remove btn-remover">–</button>
+        </div>
       `;
 
-      // Botão adicionar
       prodDiv.querySelector(".add").onclick = async () => {
-        if(!mesaSelecionada){ alert("Selecione uma mesa primeiro!"); return; }
+
+        if(!mesaSelecionada){
+          alert("Selecione uma mesa primeiro!");
+          return;
+        }
+
         const itemRef = ref(db, `mesas/${hoje}/${mesaSelecionada}/itens/${encodeURIComponent(prod.nome)}`);
         const snapshot = await get(itemRef);
         const qtd = snapshot.exists() ? snapshot.val().quantidade : 0;
-        set(itemRef, {nome: prod.nome, preco: prod.preco, quantidade: qtd+1});
+
+        set(itemRef,{
+          nome: prod.nome,
+          preco: prod.preco,
+          quantidade: qtd + 1
+        });
+
         window.mostrarToast(prod.nome + " adicionado!");
       };
 
-      // Botão remover
       prodDiv.querySelector(".remove").onclick = async () => {
-        if(!mesaSelecionada){ alert("Selecione uma mesa primeiro!"); return; }
+
+        if(!mesaSelecionada){
+          alert("Selecione uma mesa primeiro!");
+          return;
+        }
+
         const itemRef = ref(db, `mesas/${hoje}/${mesaSelecionada}/itens/${encodeURIComponent(prod.nome)}`);
         const snapshot = await get(itemRef);
+
         if(snapshot.exists()){
           const qtd = snapshot.val().quantidade;
+
           if(qtd <= 1){
             remove(itemRef);
             window.mostrarToast(prod.nome + " removido!");
           } else {
-            set(itemRef, {nome: prod.nome, preco: prod.preco, quantidade: qtd-1});
+            set(itemRef,{
+              nome: prod.nome,
+              preco: prod.preco,
+              quantidade: qtd - 1
+            });
             window.mostrarToast("1 " + prod.nome + " removido!");
           }
         }
@@ -327,8 +371,10 @@ function mostrarProdutosPorCategoria() {
       listDiv.appendChild(prodDiv);
     });
 
+    catDiv.appendChild(header);
     catDiv.appendChild(listDiv);
     div.appendChild(catDiv);
+
   });
 }
 
