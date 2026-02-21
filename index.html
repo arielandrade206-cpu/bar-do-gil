@@ -268,20 +268,21 @@ function mostrarProdutosPorCategoria() {
     const catDiv = document.createElement("div");
     catDiv.className = "categoria";
     
-    const header = document.createElement("h4");
-    header.textContent = cat;
     header.onclick = () => {
 
+  const collapseAtual = catDiv.querySelector(".collapse");
   const todas = document.querySelectorAll(".collapse");
 
-  // Fecha todas primeiro
-  todas.forEach(c => c.style.display = "none");
+  todas.forEach(c => {
+    if(c !== collapseAtual){
+      c.style.maxHeight = null;
+    }
+  });
 
-  const collapse = catDiv.querySelector(".collapse");
-
-  // Se estava fechada, abre
-  if(collapse.style.display === "none"){
-    collapse.style.display = "block";
+  if(collapseAtual.style.maxHeight){
+    collapseAtual.style.maxHeight = null;
+  } else {
+    collapseAtual.style.maxHeight = collapseAtual.scrollHeight + "px";
   }
 };
     catDiv.appendChild(header);
