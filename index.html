@@ -28,6 +28,28 @@
   --cor-borda: #243447;     /* Bordas internas suaves */
 }
 
+/* ===== ANIMAÇÃO CATEGORIAS PRO ===== */
+.collapse{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .35s ease;
+}
+
+.categoria.aberta h4{
+  box-shadow:0 0 10px var(--cor-destaque);
+  background:#243447;
+}
+
+.categoria h4{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.categoria h4 span{
+  transition:transform .3s ease;
+}
+
 /* ===== GERAL ===== */
 body{
   font-family:Arial;
