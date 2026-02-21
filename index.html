@@ -271,9 +271,19 @@ function mostrarProdutosPorCategoria() {
     const header = document.createElement("h4");
     header.textContent = cat;
     header.onclick = () => {
-      const collapse = catDiv.querySelector(".collapse");
-      collapse.style.display = (collapse.style.display === "none" ? "block" : "none");
-    };
+
+  const todas = document.querySelectorAll(".collapse");
+
+  // Fecha todas primeiro
+  todas.forEach(c => c.style.display = "none");
+
+  const collapse = catDiv.querySelector(".collapse");
+
+  // Se estava fechada, abre
+  if(collapse.style.display === "none"){
+    collapse.style.display = "block";
+  }
+};
     catDiv.appendChild(header);
 
     const listDiv = document.createElement("div");
