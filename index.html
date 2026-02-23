@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <link rel="manifest" href="manifest.json">
@@ -7,215 +7,242 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bar do Gil - Sistema PRO</title>
+<title>Bar do Gil</title>
+
 <style>
-
-/* ===== BARRA FIXA MESA ATIVA ===== */
-.mesa-fixa{
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background: #001f3f;
-  padding: 12px;
-  border-bottom: 2px solid #00bfff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-}
-
-.mesa-fixa h3{
-  margin: 0;
-  color: #00bfff;
-  font-size: 18px;
-}
-
-/* ===== PALETA NEON BAR DO GIL ===== */
-:root{
-  --cor-fundo: #0D1B2A;      /* Fundo azul quase preto */
-  --cor-texto: #FFFFFF;     /* Texto branco */
-  --cor-titulo: #00B4FF;    /* Títulos neon */
-
-  --cor-card: #1B263B;      /* Cards */
-  --cor-categoria: #1B263B; /* Mesma base dos cards */
-
-  --cor-botao: #00B4FF;     /* Botão principal */
-  --cor-botao-add: #00B4FF; /* Botão adicionar */
-
-  --cor-remover: #FF4D4D;   /* Botão remover */
-  --cor-destaque: #00B4FF;  /* Seleção e detalhes */
-
-  --cor-borda: #243447;     /* Bordas internas suaves */
-}
-
-/* ===== ANIMAÇÃO CATEGORIAS PRO ===== */
-.collapse{
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .35s ease;
-}
-
-.categoria.aberta h4{
-  box-shadow:0 0 10px var(--cor-destaque);
-  background:#243447;
-}
-
-.categoria h4{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.categoria h4 span{
-  transition:transform .3s ease;
-}
-
-/* ===== GERAL ===== */
 body{
-  font-family:Arial;
-  background:var(--cor-fundo);
-  color:var(--cor-texto);
   margin:0;
-  padding:10px;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
 }
 
-h1,h3{
+header{
+  background:#1e3a8a;
+  padding:15px;
   text-align:center;
-  color:var(--cor-titulo);
+  font-size:22px;
+  font-weight:bold;
 }
 
 input,button{
-  padding:8px;
-  margin:5px 0;
+  font-size:18px;
+  padding:10px;
   border-radius:8px;
   border:none;
-  font-size:16px;
 }
 
 button{
-  background:var(--cor-botao);
+  background:#2563eb;
   color:white;
-  cursor:pointer;
-  transition:.2s;
-}
-
-button:hover{
-  opacity:.85;
-}
-
-/* ===== MESAS ===== */
-.mesa, .historicoMesa{
-  background:var(--cor-card);
-  padding:10px;
-  margin:5px 0;
-  border-radius:10px;
-}
-
-.mesa.selecionada{
-  border:2px solid var(--cor-destaque);
-  box-shadow:0 0 10px var(--cor-destaque);
-}
-
-.total{
-  color:var(--cor-destaque);
   font-weight:bold;
 }
 
-/* ===== CATEGORIAS ===== */
-.categoria{
-  background:var(--cor-categoria);
-  margin:5px 0;
-  border-radius:6px;
-}
-
-.categoria h4{
-  margin:0;
-  padding:10px;
-  cursor:pointer;
-  background:var(--cor-card);
-  border-radius:6px;
-}
-
-/* ===== PRODUTOS ===== */
-.produto{
-  padding:5px 10px;
+.mesas{
   display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid var(--cor-borda);
+  overflow-x:auto;
+  gap:8px;
+  padding:10px;
 }
 
-.produto button{
-  background:var(--cor-botao-add);
-  border-radius:5px;
-  padding:3px 8px;
-  margin-left:5px;
+.mesaBtn{
+  background:#1e293b;
+  padding:10px;
+  border-radius:8px;
+  white-space:nowrap;
 }
 
-/* BOTÃO REMOVER */
-.btn-remover{
-  background:var(--cor-remover) !important;
+.mesaAtiva{
+  background:#2563eb;
+  border:3px solid #22c55e;
+  box-shadow:0 0 10px #22c55e;
 }
 
-/* ===== TOAST NEON ===== */
+#areaMesa{
+  background:#111827;
+  padding:10px;
+}
+
+.produtos{
+  padding:10px;
+}
+
+.produto{
+  background:#1e293b;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+.tabs{
+  display:flex;
+  overflow-x:auto;
+  gap:8px;
+  padding:10px;
+  background:#0f172a;
+}
+
+.tab{
+  background:#1e293b;
+  padding:8px 12px;
+  border-radius:20px;
+  white-space:nowrap;
+}
+
+.tabAtiva{
+  background:#2563eb;
+}
+
 .toast{
   position:fixed;
-  top:20px;
-  right:20px;
-
-  background:#00B4FF;
-  color:#FFFFFF;
-
-  padding:12px 18px;
-  border-radius:10px;
-  font-weight:bold;
-
-  box-shadow:0 0 12px rgba(0,180,255,0.6);
-
-  opacity:0;
-  transform:translateY(-20px);
-  transition:all .3s ease;
-
-  z-index:9999;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#2563eb;
+  padding:10px 20px;
+  border-radius:20px;
+  display:none;
 }
-
-.toast.show{
-  opacity:1;
-  transform:translateY(0);
-}
-
 </style>
 </head>
+
 <body>
 
-<h1>🍻 Bar do Gil</h1>
+<header>🍻 Bar do Gil</header>
 
-<!-- 🔥 MESA FIXA -->
-<div class="mesa-fixa">
-  <h3>🪑 Mesa Ativa: <span id="mesaSelecionada">Nenhuma</span></h3>
+
+<div style="padding:10px;">
+<input id="novaMesa" placeholder="Nome da mesa">
+<button onclick="criarMesa()">Criar</button>
+<button onclick="relatorio()">📊 Relatório</button>
 </div>
 
-<h3>Criar Mesa</h3>
-<input id="nomeMesa" placeholder="Digite o nome da mesa">
-<button onclick="criarMesa()">Criar</button>
 
-<h3>Pesquisar Produto</h3>
-<input id="pesquisa" placeholder="Pesquisar..." onkeyup="filtrarProdutos()">
+<div class="mesas" id="listaMesas"></div>
 
-<div id="produtos"></div>
+<div id="areaMesa">
+<h3 id="mesaNome">Nenhuma mesa selecionada</h3>
+<div id="itensMesa"></div>
+<h2>Total: R$ <span id="total">0.00</span></h2>
+<hr style="margin:15px 0;">
 
-<h3>Mesas Abertas</h3>
-<div id="mesas"></div>
+<h3>💳 Pagamento</h3>
 
-<h3>Histórico de Contas Fechadas</h3>
-<div id="historico"></div>
+<select id="formaPagamento" onchange="verificarPagamento()">
+  <option value="dinheiro">Dinheiro</option>
+  <option value="pix">Pix</option>
+</select>
 
-<h3>Resumo do Dia</h3>
-<div id="resumoDia"></div>
+<div id="areaDinheiro" style="margin-top:10px;">
+  <input type="number" id="valorRecebido" placeholder="Valor recebido"
+         oninput="calcularTroco()">
+</div>
 
-<div id="toast" class="toast"></div>
+<h3 id="trocoArea" style="margin-top:10px;">
+ <div id="areaPix" style="margin-top:15px; display:none; text-align:center;">
+  <img id="qrCodePix" width="220">
+  <p id="valorPix" style="margin-top:10px;"></p>
+</div>
+  Troco: R$ 0.00
+
+</h3>
+<button onclick="fecharConta()">💰 Fechar Conta</button>
+</div>
+
+
+<div style="padding:10px;">
+<input id="pesquisa" placeholder="Pesquisar..." oninput="renderProdutos()">
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="produtos" id="produtos"></div>
+
+<div class="toast" id="toast"></div>
+
+<div id="modalRelatorio" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  z-index:999;
+">
+
+  <div style="
+    background:#111827;
+    width:100%;
+    max-width:600px;
+    max-height:90vh;
+    overflow:auto;
+    border-radius:15px;
+    padding:20px;
+  ">
+
+    <h2 style="text-align:center;">📊 Relatório do Dia</h2>
+
+    <div id="conteudoRelatorio"></div>
+
+    <button style="margin-top:20px; width:100%;" 
+            onclick="fecharRelatorio()">Fechar</button>
+
+  </div>
+</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// ===== FIREBASE CONFIG =====
+function gerarPayloadPix(chave, valor, nome="BAR DO GIL", cidade="BRASIL"){
+
+  function format(id, value){
+    const size = value.length.toString().padStart(2,"0");
+    return id + size + value;
+  }
+
+  const payload =
+    format("00","01") +
+    format("26",
+      format("00","BR.GOV.BCB.PIX") +
+      format("01",chave)
+    ) +
+    format("52","0000") +
+    format("53","986") +
+    format("54",valor.toFixed(2)) +
+    format("58","BR") +
+    format("59",nome) +
+    format("60",cidade) +
+    format("62",
+      format("05","***")
+    );
+
+  function crc16(str){
+    let crc = 0xFFFF;
+    for(let i=0;i<str.length;i++){
+      crc ^= str.charCodeAt(i) << 8;
+      for(let j=0;j<8;j++){
+        if(crc & 0x8000){
+          crc = (crc << 1) ^ 0x1021;
+        } else {
+          crc = crc << 1;
+        }
+      }
+    }
+    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4,"0");
+  }
+
+  const payloadFinal = payload + "6304";
+  const crc = crc16(payloadFinal);
+
+  return payloadFinal + crc;
+}
+
+import { get } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getDatabase, ref, set, push, onValue, update, remove } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBqezLaspgcS9B42CXOZl-FyY-SI5TphIk",
   authDomain: "commanda-71512.firebaseapp.com",
@@ -228,404 +255,479 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const hoje = new Date().toISOString().split('T')[0];
-const mesasRef = ref(db, "mesas/"+hoje);
-const historicoRef = ref(db, "historico/"+hoje);
 
-let mesaSelecionada = null;
-let toastTimeout;
+const chavePix = "+5577981208309"; // 🔥 SUA CHAVE PIX
 
-// ===== TOAST CONFIRMAÇÃO =====
-window.mostrarToast = function(mensagem){
-  const toast = document.getElementById("toast");
+let mesaAtual = null;
+let abaAtual = "Espetos";
 
-  toast.textContent = mensagem;
+const hoje=new Date().toISOString().split("T")[0];
 
-  // Remove a animação atual
-  toast.classList.remove("show");
-
-  // Força o navegador a recalcular (reinicia animação)
-  void toast.offsetWidth;
-
-  // Ativa novamente
-  toast.classList.add("show");
-
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(()=>{
-    toast.classList.remove("show");
-  },1500);
-}
-
-// ===== PRODUTOS POR CATEGORIA =====
-const categorias = {
-  "Espetos":[
-    {nome:"Gado",preco:6},{nome:"Porco",preco:6},{nome:"Frango com osso",preco:6},
-    {nome:"Frango com bacon",preco:6},{nome:"Coração",preco:6},{nome:"Calabresa apimentada",preco:6},
-    {nome:"Calabresa defumada",preco:6},{nome:"Pão de alho",preco:6},{nome:"Queijo com bacon",preco:6}
-  ],
-  "Refrigerantes":[
-    {nome:"Sukita laranja 1L",preco:8},{nome:"Sukita laranja 2L",preco:11},{nome:"It! Guarana",preco:8},
-    {nome:"It! Coca",preco:8},{nome:"It! Laranja",preco:8},{nome:"Pepsi 2L",preco:10},
-    {nome:"Pepsi 2L zero",preco:10},{nome:"Pepsi 1L",preco:8},{nome:"Guaraná Lata",preco:5},
-    {nome:"Guaraná 1 L",preco:8},{nome:"Guaraná 2 L",preco:13},{nome:"Sukita uva 2L",preco:11},
-    {nome:"Coca lata",preco:5},{nome:"Coca 1 L",preco:9},{nome:"Coca Ls",preco:8},{nome:"Coca 2 L",preco:14},
-    {nome:"Fys em geral",preco:5},{nome:"It em geral",preco:4},{nome:"Pepsi zero lata",preco:5},
-    {nome:"Guaraná zero",preco:5},{nome:"Sukita uva",preco:5},{nome:"Sukita laranja",preco:5},
-    {nome:"Soda limonada",preco:5}
-  ],
-  "Cerveja lata/piriguetes":[
-    {nome:"Skol",preco:5},{nome:"Subzero",preco:5},{nome:"Brahma",preco:5},{nome:"Amstel",preco:5},
-    {nome:"Devassa",preco:5},{nome:"Lokal",preco:4},{nome:"Antártica",preco:5},{nome:"Crystal",preco:5},
-    {nome:"Caracu",preco:7},{nome:"Original",preco:6},{nome:"Crystal baden",preco:5},{nome:"Black princess",preco:5},
-    {nome:"Brahma zero",preco:5},{nome:"Brahma piriguete",preco:5},{nome:"Skol piriguete",preco:5},
-    {nome:"Original piriguete",preco:5},{nome:"Crystal piriguete",preco:5},{nome:"Petra piriguete",preco:5}
-  ],
-  "Long neck":[
-    {nome:"Heineken",preco:9},{nome:"Budweiser",preco:8},{nome:"Budweiser zero",preco:8},
-    {nome:"Itaipava zero",preco:8},{nome:"Cabaré limão",preco:8},{nome:"Cabaré frutas vermelhas",preco:8}
-  ],
-  "Cervejas 600ML":[
-    {nome:"Brahma 600ml",preco:10},{nome:"Skol 600ml",preco:10},{nome:"Subzero 600ml",preco:8},
-    {nome:"Amstel 600ml",preco:9},{nome:"Crystal 600ml",preco:6},{nome:"Lokal 600ml",preco:6},{nome:"Heineken 600ml",preco:12},
-    {nome:"Budweiser 600ml",preco:10},{nome:"Original 600ml",preco:10},{nome:"Antarctica 600ml",preco:8},
-    {nome:"Itaipava 600ml",preco:7},{nome:"Itaipava Premium",preco:9},{nome:"Petra 600ml",preco:8}
-  ],
-  "Energéticos/Outros":[
-    {nome:"Tnt 269ML",preco:8},{nome:"Tnt 473ML",preco:10},{nome:"Monster",preco:14},{nome:"Redbull",preco:10},
-    {nome:"Água mineral",preco:3},{nome:"Água com gás",preco:4},{nome:"Agua de coco",preco:7},
-    {nome:"H2o 500Ml",preco:7},{nome:"H2o 1,5 L",preco:10},{nome:"Skinka uva",preco:5},
-    {nome:"Skinka laranja",preco:5},{nome:"Skinka morango",preco:5},{nome:"Beats frutas verdes",preco:7}
-  ],
-  "Porções":[
-    {nome:"Mandioca 1",preco:1},{nome:"Mandioca 3",preco:3},{nome:"Mandioca 5",preco:5},{nome:"Mandioca 10",preco:10},
-    {nome:"Feijão farofado 1",preco:1},{nome:"Feijão farofado 3",preco:3},{nome:"Feijão farofado 5",preco:5},
-    {nome:"Feijão farofado 10",preco:10},{nome:"Vinagrete",preco:0}
-  ]
+const produtos={
+"Espetos":[
+["Gado",6],["Porco",6],["Frango com osso",6],
+["Frango com bacon",6],["Coração",6],
+["Calabresa apimentada",6],
+["Calabresa defumada",6],
+["Pão de alho",6],["Queijo com bacon",7]
+],
+"Refris":[
+["Sukita laranja 1L",8],
+["Sukita laranja 2L",11],
+["It! Guarana",8],["It! Coca",8],
+["It! Laranja",8],
+["Pepsi 2L",10],["Pepsi 2L zero",10],
+["Pepsi 1L",8],
+["Guaraná Lata",5],
+["Guaraná 1L",8],["Guaraná 2L",13],
+["Sukita uva 2L",11],
+["Coca lata",5],["Coca 1L",9],
+["Coca Ls",8],["Coca 2L",14],
+["Fys em geral",5],["It em geral",4],
+["Pepsi zero lata",4],["Guaraná zero",4],
+["Sukita uva",4],["Sukita laranja",4],
+["Soda limonada",4]
+],
+"Cervejas":[
+["Skol",5],["Subzero",5],["Brahma",5],
+["Amstel",5],["Devassa",5],
+["Lokal",4],["Antártica",5],
+["Crystal",5],["Caracu",7],
+["Original",6],["Crystal baden",5],
+["Black princess",5],["Brahma zero",5],
+["Heineken",9],["Budweiser",8],
+["Budweiser zero",8],["Itaipava zero",8]
+]
 };
 
-// ================= MOSTRAR PRODUTOS =================
-function mostrarProdutosPorCategoria() {
+function toast(msg){
+const t=document.getElementById("toast");
+t.innerText=msg;
+t.style.display="block";
+setTimeout(()=>t.style.display="none",2000);
+}
 
-  const div = document.getElementById("produtos");
-  div.innerHTML = "";
+window.criarMesa=function(){
+const nome=document.getElementById("novaMesa").value.trim();
+if(!nome) return;
 
-  Object.keys(categorias).forEach(cat => {
+set(ref(db,`mesas/${hoje}/${nome}`),{
+criadaEm:Date.now(),
+total:0,
+itens:{}
+});
 
-    const catDiv = document.createElement("div");
-    catDiv.className = "categoria";
+document.getElementById("novaMesa").value="";
+toast("Mesa criada");
+};
 
-    const header = document.createElement("h4");
+function carregarMesas(){
+onValue(ref(db,`mesas/${hoje}`),(snap)=>{
+const area=document.getElementById("listaMesas");
+area.innerHTML="";
+if(!snap.exists()) return;
 
-    const titulo = document.createElement("span");
-    titulo.textContent = cat;
+const dados=Object.entries(snap.val())
+.sort((a,b)=>b[1].criadaEm-a[1].criadaEm);
 
-    const seta = document.createElement("span");
-    seta.innerHTML = "▼";
+dados.forEach(([nome])=>{
+const btn=document.createElement("div");
+btn.className="mesaBtn";
+btn.innerText=nome;
+btn.onclick=()=>selecionarMesa(nome);
+area.appendChild(btn);
+});
+});
+}
 
-    header.appendChild(titulo);
-    header.appendChild(seta);
+function selecionarMesa(nome){
 
-    const listDiv = document.createElement("div");
-    listDiv.className = "collapse";
+  mesaAtual = nome;
 
-    header.onclick = () => {
+  document.getElementById("mesaNome").innerText = nome;
 
-      const todasCategorias = document.querySelectorAll(".categoria");
-      const todasCollapses = document.querySelectorAll(".collapse");
-
-      todasCategorias.forEach(c => c.classList.remove("aberta"));
-
-      todasCollapses.forEach(c => {
-        if(c !== listDiv){
-          c.style.maxHeight = null;
-        }
-      });
-
-      if(listDiv.style.maxHeight){
-        listDiv.style.maxHeight = null;
-        seta.style.transform = "rotate(0deg)";
-        catDiv.classList.remove("aberta");
-      } else {
-        listDiv.style.maxHeight = listDiv.scrollHeight + "px";
-        seta.style.transform = "rotate(180deg)";
-        catDiv.classList.add("aberta");
-      }
-    };
-
-    categorias[cat].forEach(prod => {
-
-      const prodDiv = document.createElement("div");
-      prodDiv.className = "produto";
-
-      prodDiv.innerHTML = `
-        ${prod.nome} - R$${prod.preco}
-        <div>
-          <button class="add">+</button>
-          <button class="remove btn-remover">–</button>
-        </div>
-      `;
-
-      prodDiv.querySelector(".add").onclick = async () => {
-
-        if(!mesaSelecionada){
-          alert("Selecione uma mesa primeiro!");
-          return;
-        }
-
-        const itemRef = ref(db, `mesas/${hoje}/${mesaSelecionada}/itens/${encodeURIComponent(prod.nome)}`);
-        const snapshot = await get(itemRef);
-        const qtd = snapshot.exists() ? snapshot.val().quantidade : 0;
-
-        set(itemRef,{
-          nome: prod.nome,
-          preco: prod.preco,
-          quantidade: qtd + 1
-        });
-
-        window.mostrarToast(prod.nome + " adicionado!");
-      };
-
-      prodDiv.querySelector(".remove").onclick = async () => {
-
-        if(!mesaSelecionada){
-          alert("Selecione uma mesa primeiro!");
-          return;
-        }
-
-        const itemRef = ref(db, `mesas/${hoje}/${mesaSelecionada}/itens/${encodeURIComponent(prod.nome)}`);
-        const snapshot = await get(itemRef);
-
-        if(snapshot.exists()){
-          const qtd = snapshot.val().quantidade;
-
-          if(qtd <= 1){
-            remove(itemRef);
-            window.mostrarToast(prod.nome + " removido!");
-          } else {
-            set(itemRef,{
-              nome: prod.nome,
-              preco: prod.preco,
-              quantidade: qtd - 1
-            });
-            window.mostrarToast("1 " + prod.nome + " removido!");
-          }
-        }
-      };
-
-      listDiv.appendChild(prodDiv);
-    });
-
-    catDiv.appendChild(header);
-    catDiv.appendChild(listDiv);
-    div.appendChild(catDiv);
-
+  // 🔥 Remove seleção anterior
+  document.querySelectorAll(".mesaBtn").forEach(btn=>{
+    btn.classList.remove("mesaAtiva");
   });
-}
 
-mostrarProdutosPorCategoria();
-
-// ================= CRIAR MESA =================
-window.criarMesa = function(){
-  const nome = document.getElementById("nomeMesa").value;
-  if(!nome) return alert("Digite o nome da mesa!");
-  push(mesasRef, {nome, itens:{}});
-  document.getElementById("nomeMesa").value = "";
-}
-
-// ================= MOSTRAR MESAS =================
-function atualizarMesas(){
-  onValue(mesasRef, snapshot => {
-    const data = snapshot.val();
-    const div = document.getElementById("mesas");
-    div.innerHTML = "";
-    if(data){
-      Object.keys(data).forEach(id => {
-        const itens = data[id].itens || {};
-        let total = 0;
-        let detalhes = "";
-        Object.values(itens).forEach(item => {
-          total += item.preco * item.quantidade;
-          detalhes += `${item.nome} x${item.quantidade} | `;
-        });
-
-        const mesaDiv = document.createElement("div");
-        mesaDiv.className = "mesa";
-        mesaDiv.dataset.id = id;
-
-        mesaDiv.innerHTML = `
-          <strong>${data[id].nome}</strong><br>
-          ${detalhes}<br>
-          Total: <span class="total">R$${total}</span><br>
-          <button class="pixBtn">💳 Pix</button>
-          <button class="fecharConta">Fechar Conta</button>
-        `;
-
-        // Selecionar mesa
-        mesaDiv.onclick = (e) => {
-          if(e.target.tagName === "BUTTON") return;
-          mesaSelecionada = id;
-          document.querySelectorAll(".mesa").forEach(m => m.classList.remove("selecionada"));
-          mesaDiv.classList.add("selecionada");
-        };
-
-        // BOTÃO PIX (AGORA FORA DO FECHAR CONTA)
-        mesaDiv.querySelector(".pixBtn").onclick = (e) => {
-          e.stopPropagation();
-          gerarPix(total, data[id].nome);
-        };
-
-        // BOTÃO FECHAR CONTA
-        mesaDiv.querySelector(".fecharConta").onclick = (e) => {
-          e.stopPropagation();
-
-          if(confirm(`Fechar conta da mesa "${data[id].nome}"?\nTotal: R$${total}`)){
-            const registro = {
-              nome: data[id].nome,
-              itens: data[id].itens,
-              total: total,
-              pagamento: "Pix ou Dinheiro",
-              fechadoEm: new Date().toLocaleString()
-            };
-
-            push(historicoRef, registro);
-            remove(ref(db, "mesas/"+hoje+"/"+id));
-
-            if(mesaSelecionada===id) mesaSelecionada = null;
-          }
-        };
-
-        div.appendChild(mesaDiv);
-      });
+  // 🔥 Adiciona contorno na mesa clicada
+  const botoes = document.querySelectorAll(".mesaBtn");
+  botoes.forEach(btn=>{
+    if(btn.innerText === nome){
+      btn.classList.add("mesaAtiva");
     }
   });
+
+  onValue(ref(db, `mesas/${hoje}/${nome}`),(snap)=>{
+    const dados = snap.val();
+
+    document.getElementById("total").innerText =
+      (dados.total || 0).toFixed(2);
+
+    const area = document.getElementById("itensMesa");
+    area.innerHTML = "";
+
+    if(dados.itens){
+      Object.entries(dados.itens).forEach(([id,item])=>{
+        const div = document.createElement("div");
+        div.className="produto";
+        div.innerHTML = `
+  <b>${item.nome}</b><br>
+
+  <button onclick="alterarQtd('${id}', -1, ${item.preco})">➖</button>
+  <span style="margin:0 10px;">${item.qtd}</span>
+  <button onclick="alterarQtd('${id}', 1, ${item.preco})">➕</button>
+
+  <br>
+  Total: R$ ${(item.qtd * item.preco).toFixed(2)}
+
+  <br><br>
+  <button onclick="removerItem('${id}', ${item.preco}, ${item.qtd})">
+    ❌ Remover tudo
+  </button>
+`;
+        area.appendChild(div);
+      });
+    }
+
+  });
 }
 
-atualizarMesas();
+window.removerItem = async function(id, preco, qtd){
 
-// ================= HISTÓRICO E RESUMO =================
-onValue(historicoRef, snapshot => {
-  const data = snapshot.val();
-  const div = document.getElementById("historico");
-  const resumoDiv = document.getElementById("resumoDia");
+  const itemRef = ref(db, `mesas/${hoje}/${mesaAtual}/itens/${id}`);
 
-  div.innerHTML = "";
-  resumoDiv.innerHTML = "";
+  if(qtd > 1){
 
-  if(!data){
-    div.innerHTML = "<p style='color:lightgray;'>Nenhum histórico por hoje.</p>";
-    resumoDiv.innerHTML = "<p style='color:lightgray;'>Nenhuma venda hoje.</p>";
+    // 🔥 diminui só 1 unidade
+    await update(itemRef, {
+      qtd: qtd - 1
+    });
+
+  } else {
+
+    // 🔥 só remove quando chegar a 1
+    await remove(itemRef);
+
+  }
+
+  // 🔥 Atualiza total corretamente
+  const mesaRef = ref(db, `mesas/${hoje}/${mesaAtual}`);
+  const snap = await get(mesaRef);
+
+  let totalAtual = snap.val().total || 0;
+  totalAtual -= preco;
+
+  if(totalAtual < 0) totalAtual = 0;
+
+  await update(mesaRef, { total: totalAtual });
+
+  toast("1 item removido");
+}
+
+function renderTabs(){
+  const area=document.getElementById("tabs");
+  area.innerHTML="";
+  Object.keys(produtos).forEach(cat=>{
+    const btn=document.createElement("div");
+    btn.className="tab"+(cat===abaAtual?" tabAtiva":"");
+    btn.innerText=cat;
+    btn.onclick=()=>{
+      abaAtual=cat;
+      renderTabs();
+      renderProdutos();
+    }
+    area.appendChild(btn);
+  });
+}
+function renderProdutos(){
+const area=document.getElementById("produtos");
+area.innerHTML="";
+const filtro=document.getElementById("pesquisa").value.toLowerCase();
+
+produtos[abaAtual]
+.filter(p=>p[0].toLowerCase().includes(filtro))
+.forEach((p,i)=>{
+const div=document.createElement("div");
+div.className="produto";
+div.innerHTML=`
+${p[0]} - R$ ${p[1]}
+<br>
+<input type="number" min="1" value="1" id="q${i}">
+<button>Adicionar</button>
+`;
+
+div.querySelector("button").onclick = async () => {
+
+  if (!mesaAtual) {
+    alert("Selecione uma mesa");
+    return;
+  }
+
+  const qtd = parseInt(document.getElementById("q"+i).value);
+
+  const itensRef = ref(db, `mesas/${hoje}/${mesaAtual}/itens`);
+  const snapshot = await get(itensRef);
+
+  let encontrou = false;
+
+  if (snapshot.exists()) {
+    Object.entries(snapshot.val()).forEach(([id, item]) => {
+
+      if (item.nome === p[0]) {
+
+        update(ref(db, `mesas/${hoje}/${mesaAtual}/itens/${id}`), {
+          qtd: item.qtd + qtd
+        });
+
+        encontrou = true;
+      }
+
+    });
+  }
+
+  if (!encontrou) {
+
+    const itemRef = push(itensRef);
+
+    set(itemRef, {
+      nome: p[0],
+      preco: p[1],
+      qtd: qtd
+    });
+
+  }
+
+  // Atualiza total corretamente
+  const mesaSnap = await get(ref(db, `mesas/${hoje}/${mesaAtual}`));
+  let totalAtual = mesaSnap.val().total || 0;
+
+  await update(ref(db, `mesas/${hoje}/${mesaAtual}`), {
+    total: totalAtual + (p[1] * qtd)
+  });
+
+  toast("Item adicionado!");
+
+};
+
+area.appendChild(div);
+});
+}
+
+window.fecharConta = async function(){
+
+  if(!mesaAtual) return alert("Selecione uma mesa");
+
+  const mesaRef = ref(db, `mesas/${hoje}/${mesaAtual}`);
+  const snap = await get(mesaRef);
+
+  const dados = snap.val();
+
+  await set(ref(db, `historico/${hoje}/${mesaAtual}`), dados);
+
+  await remove(mesaRef);
+
+  mesaAtual = null;
+
+  document.getElementById("mesaNome").innerText = "Nenhuma mesa selecionada";
+  document.getElementById("itensMesa").innerHTML = "";
+  document.getElementById("total").innerText = "0.00";
+
+  toast("Conta fechada!");
+};
+
+window.relatorio = async function(){
+
+  const snap = await get(ref(db, `historico/${hoje}`));
+
+  if(!snap.exists()){
+    alert("Sem vendas hoje");
     return;
   }
 
   let totalDia = 0;
-  let quantidadeMesas = 0;
+  let totalMesas = 0;
+  let produtosContagem = {};
+  let resumoMesas = "";
 
-  Object.values(data).forEach(mesa => {
-    quantidadeMesas++;
-    totalDia += mesa.total;
+  Object.entries(snap.val()).forEach(([nomeMesa, mesa])=>{
 
-    const itens = mesa.itens || {};
-    let detalhes = "";
-    Object.values(itens).forEach(item => {
-      detalhes += `${item.nome} x${item.quantidade} | `;
+    totalMesas++;
+    totalDia += mesa.total || 0;
+
+    resumoMesas += `
+      <div style="background:#1e293b; padding:10px; border-radius:10px; margin-bottom:10px;">
+        <b>🪑 Mesa ${nomeMesa}</b><br>
+        💰 Total: R$ ${(mesa.total || 0).toFixed(2)}
+      </div>
+    `;
+
+    if(mesa.itens){
+      Object.values(mesa.itens).forEach(item=>{
+        if(!produtosContagem[item.nome]){
+          produtosContagem[item.nome] = 0;
+        }
+        produtosContagem[item.nome] += item.qtd;
+      });
+    }
+
+  });
+
+  let maisVendido = "Nenhum";
+  let maiorQtd = 0;
+
+  Object.entries(produtosContagem).forEach(([nome, qtd])=>{
+    if(qtd > maiorQtd){
+      maiorQtd = qtd;
+      maisVendido = nome;
+    }
+  });
+
+  let listaProdutos = "";
+
+  Object.entries(produtosContagem)
+    .sort((a,b)=>b[1]-a[1])
+    .forEach(([nome, qtd])=>{
+      listaProdutos += `
+        <div style="display:flex; justify-content:space-between;">
+          <span>${nome}</span>
+          <span>${qtd}x</span>
+        </div>
+      `;
     });
 
-    const histDiv = document.createElement("div");
-    histDiv.className = "historicoMesa";
-    histDiv.innerHTML = `
-      <strong>${mesa.nome}</strong><br>
-      ${detalhes}<br>
-      <span class="total">R$${mesa.total}</span><br>
-      <small style="color:lightgray;">Fechado em: ${mesa.fechadoEm}</small>
-    `;
-    div.appendChild(histDiv);
-  });
+  const ticketMedio = totalMesas > 0 ? totalDia / totalMesas : 0;
 
-  const media = (totalDia / quantidadeMesas).toFixed(2);
-
-  resumoDiv.innerHTML = `
-    <div class="mesa">
-      💰 Total vendido hoje: <span class="total">R$${totalDia}</span><br>
-      🧾 Contas fechadas: ${quantidadeMesas}<br>
-      📈 Média por mesa: R$${media}
+  document.getElementById("conteudoRelatorio").innerHTML = `
+    <div style="margin-bottom:15px;">
+      <b>💰 Total vendido:</b> R$ ${totalDia.toFixed(2)}<br>
+      <b>🪑 Mesas fechadas:</b> ${totalMesas}<br>
+      <b>📈 Ticket médio:</b> R$ ${ticketMedio.toFixed(2)}<br>
+      <b>🏆 Mais vendido:</b> ${maisVendido} (${maiorQtd}x)
     </div>
+
+    <hr style="margin:15px 0;">
+
+    <h3>📦 Produtos Vendidos</h3>
+    ${listaProdutos}
+
+    <hr style="margin:15px 0;">
+
+    <h3>📋 Resumo das Mesas</h3>
+    ${resumoMesas}
   `;
-});
 
-// ================= PESQUISA DE PRODUTOS =================
-window.filtrarProdutos = function(){
-  const filtro = document.getElementById("pesquisa").value.toLowerCase();
-  document.querySelectorAll(".produto").forEach(prod => {
-    const nome = prod.textContent.toLowerCase();
-    prod.style.display = nome.includes(filtro)? "flex":"none";
+  document.getElementById("modalRelatorio").style.display = "flex";
+};
+
+ 
+window.alterarQtd = async function(id, delta, preco){
+
+  const itemRef = ref(db, `mesas/${hoje}/${mesaAtual}/itens/${id}`);
+  const snap = await get(itemRef);
+
+  if(!snap.exists()) return;
+
+  let item = snap.val();
+  let novaQtd = item.qtd + delta;
+
+  // Se quantidade for 0, remove o item
+  if(novaQtd <= 0){
+
+    await remove(itemRef);
+
+    const mesaSnap = await get(ref(db, `mesas/${hoje}/${mesaAtual}`));
+    let totalAtual = mesaSnap.val().total || 0;
+
+    totalAtual -= preco;
+    if(totalAtual < 0) totalAtual = 0;
+
+    await update(ref(db, `mesas/${hoje}/${mesaAtual}`), {
+      total: totalAtual
+    });
+
+    return;
+  }
+
+  // Atualiza quantidade
+  await update(itemRef, { qtd: novaQtd });
+
+  // Atualiza total
+  const mesaSnap = await get(ref(db, `mesas/${hoje}/${mesaAtual}`));
+  let totalAtual = mesaSnap.val().total || 0;
+
+  totalAtual += preco * delta;
+
+  await update(ref(db, `mesas/${hoje}/${mesaAtual}`), {
+    total: totalAtual
   });
+
+};
+
+window.verificarPagamento = async function(){
+
+  console.log("verificarPagamento rodou");
+
+  if(!mesaAtual) return;
+
+  const forma = document.getElementById("formaPagamento").value;
+
+  const mesaSnap = await get(ref(db, `mesas/${hoje}/${mesaAtual}`));
+  const total = mesaSnap.val().total || 0;
+
+  console.log("Total:", total);
+
+  if(forma === "pix"){
+
+    document.getElementById("areaDinheiro").style.display = "none";
+    document.getElementById("areaPix").style.display = "block";
+
+    const payload = gerarPayloadPix(chavePix, total);
+
+    const urlQR =
+      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+      encodeURIComponent(payload);
+
+    document.getElementById("qrCodePix").src = urlQR;
+    document.getElementById("valorPix").innerText =
+      "Valor: R$ " + total.toFixed(2);
+
+  } else {
+
+    document.getElementById("areaDinheiro").style.display = "block";
+    document.getElementById("areaPix").style.display = "none";
+    calcularTroco();
+
+  }
+};
+
+window.calcularTroco = async function(){
+
+  if(!mesaAtual) return;
+
+  const recebido = parseFloat(
+    document.getElementById("valorRecebido").value
+  ) || 0;
+
+  const mesaSnap = await get(ref(db, `mesas/${hoje}/${mesaAtual}`));
+  const total = mesaSnap.val().total || 0;
+
+  const troco = recebido - total;
+
+  document.getElementById("trocoArea").innerText =
+    "Troco: R$ " + (troco > 0 ? troco.toFixed(2) : "0.00");
 }
 
-function gerarPix(valorTotal, nomeMesa){
+window.fecharRelatorio = function(){
+  document.getElementById("modalRelatorio").style.display = "none";
+};
 
-  const chave = "+5577981208309";
-  const nome = "GILSON RODRIGUES AMADO";
-  const cidade = "IUIU";
-  const valor = valorTotal.toFixed(2);
-
-  function format(id, value){
-    return id + value.length.toString().padStart(2,'0') + value;
-  }
-
-  function crc16(payload) {
-    let polinomio = 0x1021;
-    let resultado = 0xFFFF;
-
-    for (let i = 0; i < payload.length; i++) {
-      resultado ^= (payload.charCodeAt(i) << 8);
-      for (let j = 0; j < 8; j++) {
-        if ((resultado <<= 1) & 0x10000) resultado ^= polinomio;
-        resultado &= 0xFFFF;
-      }
-    }
-    return resultado.toString(16).toUpperCase().padStart(4, '0');
-  }
-
-  const gui = format("00", "BR.GOV.BCB.PIX");
-  const chavePix = format("01", chave);
-  const merchantAccount = format("26", gui + chavePix);
-
-  const nomeLimpo = nome.trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
-  const cidadeLimpa = cidade.trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
-  const txid = nomeMesa.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
-
-  const payloadSemCRC =
-    format("00", "01") +
-    merchantAccount +
-    format("52", "0000") +
-    format("53", "986") +
-    format("54", valor) +
-    format("58", "BR") +
-    format("59", nomeLimpo) +
-    format("60", cidadeLimpa) +
-    format("62", format("05", txid)) +
-    "6304";
-
-  const codigo = payloadSemCRC + crc16(payloadSemCRC);
-
-  let qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(codigo);
-
-  const janela = window.open("", "Pix", "width=350,height=500");
-  janela.document.write(`
-    <div style="font-family:Arial;text-align:center;">
-      <h3>Pagamento Pix</h3>
-      <p>Mesa: ${nomeMesa}</p>
-      <p>Total: R$${valor}</p>
-      <img src="${qrUrl}">
-      <textarea style="width:90%;height:80px;">${codigo}</textarea>
-      <br><br>
-      <button onclick="window.close()">Fechar</button>
-    </div>
-  `);
-}
+renderTabs();
+renderProdutos();
+carregarMesas();
 
 </script>
-
 </body>
 </html>
-	
+
