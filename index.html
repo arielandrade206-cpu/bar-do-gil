@@ -15,6 +15,7 @@ body{
   font-family:Arial;
   background:#0f172a;
   color:white;
+  font: size 23px;   /* 🔥 aumenta aqui */
 }
 
 header{
@@ -103,6 +104,11 @@ button{
   border-radius:20px;
   display:none;
 }
+
+#itensMesa .produto{
+  font-size:24px;
+}
+
 </style>
 </head>
 
@@ -263,41 +269,132 @@ let abaAtual = "Espetos";
 
 const hoje=new Date().toISOString().split("T")[0];
 
-const produtos={
+const produtos = {
+
 "Espetos":[
-["Gado",6],["Porco",6],["Frango com osso",6],
-["Frango com bacon",6],["Coração",6],
 ["Calabresa apimentada",6],
 ["Calabresa defumada",6],
-["Pão de alho",6],["Queijo com bacon",7]
+["Coração",6],
+["Frango com bacon",6],
+["Frango com osso",6],
+["Gado",6],
+["Pão de alho",6],
+["Porco",6],
+["Queijo com bacon",6]
 ],
-"Refris":[
+
+"Refris 1L / 2L":[
+["Coca 1L",9],
+["Coca 2L",14],
+["Coca Ls",8],
+["Guaraná 1L",8],
+["Guaraná 2L",13],
+["Pepsi 1L",8],
+["Pepsi 2L",10],
+["Pepsi 2L zero",10],
+["Pepsi zero 1L",8],
+["Pepsi twister",10],
 ["Sukita laranja 1L",8],
 ["Sukita laranja 2L",11],
-["It! Guarana",8],["It! Coca",8],
-["It! Laranja",8],
-["Pepsi 2L",10],["Pepsi 2L zero",10],
-["Pepsi 1L",8],
-["Guaraná Lata",5],
-["Guaraná 1L",8],["Guaraná 2L",13],
-["Sukita uva 2L",11],
-["Coca lata",5],["Coca 1L",9],
-["Coca Ls",8],["Coca 2L",14],
-["Fys em geral",5],["It em geral",4],
-["Pepsi zero lata",4],["Guaraná zero",4],
-["Sukita uva",4],["Sukita laranja",4],
-["Soda limonada",4]
+["Sukita uva 2L",11]
 ],
-"Cervejas":[
-["Skol",5],["Subzero",5],["Brahma",5],
-["Amstel",5],["Devassa",5],
-["Lokal",4],["Antártica",5],
-["Crystal",5],["Caracu",7],
-["Original",6],["Crystal baden",5],
-["Black princess",5],["Brahma zero",5],
-["Heineken",9],["Budweiser",8],
-["Budweiser zero",8],["Itaipava zero",8]
+
+"Refris Lata":[
+["Coca lata",5],
+["Guaraná Lata",5],
+["Guaraná zero",4],
+["Pepsi zero lata",4],
+["Soda limonada",4],
+["Sukita laranja",4],
+["Sukita uva",4],
+["Fys em geral",5],
+["It em geral",4],
+["It! Coca",8],
+["It! Laranja",8],
+["It! limao",8],
+["It! guarana",8]
+],
+
+"Cerveja lata":[
+["Amstel",5],
+["Antártica",5],
+["Black princess",5],
+["Brahma",5],
+["Brahma zero",5],
+["Caracu",7],
+["Crystal",5],
+["Crystal baden",5],
+["Devassa",5],
+["Lokal",4],
+["Original",6],
+["Skol",5],
+["Subzero",5]
+],
+
+"Piriguetes":[
+["Brahma piriguete",5],
+["Crystal piriguete",5],
+["Original piriguete",5],
+["Petra piriguete",5],
+["Skol piriguete",5]
+],
+
+"Long neck":[
+["Budweiser",8],
+["Budweiser zero",8],
+["Cabaré frutas vermelhas",8],
+["Cabaré limão",8],
+["Heineken",9],
+["Itaipava zero",8]
+],
+
+"Cervejas 600ML":[
+["Amstel",9],
+["Antarctica",9],
+["Brahma",10],
+["Budweiser",10],
+["Crystal",6],
+["Heineken",12],
+["Itaipava",7],
+["Itaipava Premium",9],
+["Lokal",6],
+["Original",10],
+["Petra",8],
+["Skol",10],
+["Subzero",8]
+],
+
+"Energético":[
+["Beats frutas verdes",7],
+["Monster",14],
+["Redbull",10],
+["Tnt 269ML",8],
+["Tnt 473ML",10]
+],
+
+"Outros":[
+["Agua de coco",7],
+["Água com gás",4],
+["Água mineral",3],
+["H2o 1,5L",10],
+["H2o 500ML",7],
+["Skinka laranja",5],
+["Skinka morango",5],
+["Skinka uva",5]
+],
+
+"Porções":[
+["Feijão farofado (1)",1],
+["Feijão farofado (3)",3],
+["Feijão farofado (5)",5],
+["Feijão farofado (10)",10],
+["Mandioca (1)",1],
+["Mandioca (3)",3],
+["Mandioca (5)",5],
+["Mandioca (10)",10],
+["Vinagrete",0]
 ]
+
 };
 
 function toast(msg){
